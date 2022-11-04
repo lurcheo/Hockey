@@ -1,4 +1,5 @@
 ﻿using Hockey.Client.BusinessLayer;
+using Hockey.Client.Main;
 using Hockey.Client.Shell.ViewModel;
 using Prism.Ioc;
 using Prism.Modularity;
@@ -25,5 +26,7 @@ public partial class App : PrismApplication
     protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
     {
         base.ConfigureModuleCatalog(moduleCatalog);
+
+        moduleCatalog.AddModule<MainModule>();
     }
 }

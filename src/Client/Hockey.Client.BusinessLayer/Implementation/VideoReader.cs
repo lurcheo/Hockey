@@ -9,9 +9,14 @@ internal class VideoReader : IVideoReader
 {
     private readonly VideoCapture _videoCapture;
 
+    public int MillisecondsPerFrame => (int)(1_000 / Fps);
+
+    public double Fps { get; }
+
     public VideoReader(IFactory<VideoCapture> videoCaptureFactory)
     {
         _videoCapture = videoCaptureFactory.Create();
+        Fps = _videoCapture.Fps;
     }
 
     public IEnumerator<Mat> GetEnumerator()

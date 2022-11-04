@@ -1,20 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.6.0.20220608" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Hockey.Client.BusinessLayer\Hockey.Client.BusinessLayer.csproj" />
-    <ProjectReference Include="..\Hockey.Client.Main\Hockey.Client.Main.csproj" />
   </ItemGroup>
 
 </Project>
