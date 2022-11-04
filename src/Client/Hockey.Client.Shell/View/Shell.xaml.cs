@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Hockey.Client.Shell;
+namespace Hockey.Client.Shell.View;
 
 public partial class Shell : Window
 {
