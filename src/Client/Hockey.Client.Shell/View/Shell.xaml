@@ -8,20 +8,22 @@
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sh="clr-namespace:Hockey.Client.Shared.View;assembly=Hockey.Client.Shared"
     xmlns:vm="clr-namespace:Hockey.Client.Shell.ViewModel"
-    Width="800"
-    Height="450"
+    Width="1920"
+    Height="1280"
     d:DataContext="{d:DesignInstance vm:ShellViewModel}"
-    Background="{DynamicResource MaterialDesignPaper}"
-    FontFamily="{DynamicResource MaterialDesignFont}"
-    TextElement.FontSize="13"
-    TextElement.FontWeight="Regular"
-    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-    TextOptions.TextFormattingMode="Ideal"
-    TextOptions.TextRenderingMode="Auto"
+    Style="{StaticResource MaterialDesignWindow}"
+    WindowState="Maximized"
     mc:Ignorable="d">
-    <TabControl Style="{StaticResource MaterialDesignAppBarTabControl}">
-        <TabItem Header="Основное">
-            <ContentControl prism:RegionManager.RegionName="{x:Static sh:GlobalRegions.Main}" />
-        </TabItem>
-    </TabControl>
+    <Grid>
+        <TabControl Style="{StaticResource MaterialDesignAppBarTabControl}">
+            <TabItem Header="Основное">
+                <ContentControl prism:RegionManager.RegionName="{x:Static sh:GlobalRegions.Main}" />
+            </TabItem>
+        </TabControl>
+        <ContentControl
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            prism:RegionManager.RegionName="{x:Static sh:GlobalRegions.Settings}" />
+    </Grid>
+
 </Window>

@@ -14,11 +14,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hockey.Client.Shared", "src\Client\Hockey.Client.Shared\Hockey.Client.Shared.csproj", "{28130BA2-D67D-4822-BE40-11F6B35B0710}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hockey.Client.Shared", "src\Client\Hockey.Client.Shared\Hockey.Client.Shared.csproj", "{28130BA2-D67D-4822-BE40-11F6B35B0710}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hockey.Client.BusinessLayer", "src\Client\Hockey.Client.BusinessLayer\Hockey.Client.BusinessLayer.csproj", "{9FA82B81-3F99-4977-B9F4-0279F13262ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hockey.Client.Main", "src\Client\Hockey.Client.Main\Hockey.Client.Main.csproj", "{9FE6BAB9-E5D3-4F98-A649-EC3BA1CC930E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hockey.Client.Main", "src\Client\Hockey.Client.Main\Hockey.Client.Main.csproj", "{9FE6BAB9-E5D3-4F98-A649-EC3BA1CC930E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hockey.Client.Settings", "src\Client\Hockey.Client.Settings\Hockey.Client.Settings.csproj", "{74BC7F3E-6AF7-4711-B262-A34C41141DAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,10 @@ Global
 		{9FE6BAB9-E5D3-4F98-A649-EC3BA1CC930E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FE6BAB9-E5D3-4F98-A649-EC3BA1CC930E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FE6BAB9-E5D3-4F98-A649-EC3BA1CC930E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74BC7F3E-6AF7-4711-B262-A34C41141DAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74BC7F3E-6AF7-4711-B262-A34C41141DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74BC7F3E-6AF7-4711-B262-A34C41141DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74BC7F3E-6AF7-4711-B262-A34C41141DAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +57,7 @@ Global
 		{28130BA2-D67D-4822-BE40-11F6B35B0710} = {C40487C2-D511-499A-BAB1-334E3177F36F}
 		{9FA82B81-3F99-4977-B9F4-0279F13262ED} = {C40487C2-D511-499A-BAB1-334E3177F36F}
 		{9FE6BAB9-E5D3-4F98-A649-EC3BA1CC930E} = {C40487C2-D511-499A-BAB1-334E3177F36F}
+		{74BC7F3E-6AF7-4711-B262-A34C41141DAE} = {C40487C2-D511-499A-BAB1-334E3177F36F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {574C2824-4079-45A3-9378-C3CE10874744}

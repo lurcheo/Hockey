@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Hockey.Client.BusinessLayer\Hockey.Client.BusinessLayer.csproj" />
     <ProjectReference Include="..\Hockey.Client.Main\Hockey.Client.Main.csproj" />
+    <ProjectReference Include="..\Hockey.Client.Settings\Hockey.Client.Settings.csproj" />
   </ItemGroup>
 
 </Project>

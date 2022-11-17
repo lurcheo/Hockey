@@ -1,0 +1,63 @@
+﻿<UserControl
+    x:Class="Hockey.Client.Main.View.TeamControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Hockey.Client.Main.View"
+    xmlns:m="clr-namespace:Hockey.Client.Main.Model"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+    d:DataContext="{d:DesignInstance Type=m:TeamModel}"
+    mc:Ignorable="d">
+    <GroupBox>
+        <GroupBox.HeaderTemplate>
+            <DataTemplate>
+                <Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding DataContext.Players.Count, RelativeSource={RelativeSource AncestorType={x:Type local:TeamControl}}, StringFormat='{}Команда ({0}): ', Mode=OneWay}" />
+                            <TextBox
+                                MinWidth="200"
+                                VerticalAlignment="Center"
+                                Text="{Binding DataContext.Name, RelativeSource={RelativeSource AncestorType={x:Type local:TeamControl}}}" />
+                        </StackPanel>
+                        <Button
+                            Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            Command="{Binding AddCommand, RelativeSource={RelativeSource AncestorType={x:Type local:TeamControl}}}"
+                            Content="{md:PackIcon Kind=Plus}" />
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+        </GroupBox.HeaderTemplate>
+        <DataGrid IsReadOnly="False" ItemsSource="{Binding Players}">
+            <DataGrid.Columns>
+                <md:DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding PlayerNumber}"
+                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                    Header="Номер" />
+                <md:DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Name}"
+                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"
+                    Header="Имя" />
+                <DataGridTemplateColumn Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button
+                                Command="{Binding RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type local:TeamControl}}}"
+                                CommandParameter="{Binding}"
+                                Content="{md:PackIcon Kind=Trash}"
+                                Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </GroupBox>
+</UserControl>

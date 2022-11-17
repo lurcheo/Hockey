@@ -1,5 +1,6 @@
 ﻿using Hockey.Client.BusinessLayer;
 using Hockey.Client.Main;
+using Hockey.Client.Settings;
 using Hockey.Client.Shell.ViewModel;
 using Prism.Ioc;
 using Prism.Modularity;
@@ -28,5 +29,6 @@ public partial class App : PrismApplication
         base.ConfigureModuleCatalog(moduleCatalog);
 
         moduleCatalog.AddModule<MainModule>();
+        moduleCatalog.AddModule<SettingsModule>();
     }
 }
