@@ -1,6 +1,9 @@
 ﻿using Hockey.Client.BusinessLayer.Abstraction;
+using Hockey.Client.Main.Model.Events;
 using OpenCvSharp;
 using ReactiveUI;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +19,9 @@ internal interface IMainModel : IReactiveObject
     TeamModel HomeTeam { get; }
     TeamModel GuestTeam { get; }
     bool IsUserClick { get; set; }
+    ObservableCollection<EventModel> Events { get; }
+    IEnumerable<EventTypeModel> EventTypes { get; }
 
     Task ReadVideoFromFile(string fileName, CancellationToken cancellationToken);
+    void SetPosition(long position);
 }
