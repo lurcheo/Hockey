@@ -19,6 +19,8 @@ internal class VideoReader : IVideoReader
     public long FramesCount { get; }
     public TimeSpan Duration => TimeSpan.FromMilliseconds(MillisecondsPerFrame * FramesCount);
 
+    private Mat _lastFrame;
+
     public VideoReader(IFactory<VideoCapture> videoCaptureFactory)
     {
         _videoCapture = videoCaptureFactory.Create();
@@ -31,32 +33,21 @@ internal class VideoReader : IVideoReader
         _videoCapture.Set(VideoCaptureProperties.PosFrames, position);
     }
 
-    public IEnumerator<FrameInfo> GetEnumerator()
+    public FrameInfo GetFrame()
     {
-        var st = Stopwatch.StartNew();
-        while (true)
+        _lastFrame?.Dispose();
+        _lastFrame = new();
+
+        var result = _videoCapture.Read(_lastFrame);
+
+        if (result)
         {
-            st.Restart();
-            using Mat frame = new();
-            if (!_videoCapture.Read(frame))
-            {
-                break;
-            }
-
-            yield return new FrameInfo(frame, (long)_videoCapture.Get(VideoCaptureProperties.PosFrames));
-
-            long delay = MillisecondsPerFrame - st.ElapsedMilliseconds;
-
-            if (delay > 0)
-            {
-                Thread.Sleep((int)delay);
-            }
+            return new FrameInfo(_lastFrame, (long)_videoCapture.Get(VideoCaptureProperties.PosFrames));
         }
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
+        else
+        {
+            return default;
+        }
     }
 
     public void Dispose()

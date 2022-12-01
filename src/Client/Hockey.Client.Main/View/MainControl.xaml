@@ -2,11 +2,13 @@
     x:Class="Hockey.Client.Main.View.MainControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:beh="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Hockey.Client.Main.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:prism="http://prismlibrary.com/"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
     xmlns:vm="clr-namespace:Hockey.Client.Main.ViewModel"
     d:DataContext="{d:DesignInstance vm:MainViewModel}"
     d:Height="450"
@@ -26,77 +28,143 @@
                 <Setter Property="Cursor" Value="Hand" />
             </Style>
         </Grid.Resources>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="3*" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition />
-            <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Grid.Column="0">
-            <MenuItem Header="Открыть">
-                <MenuItem Command="{Binding ReadVideoFromFileCommand}" Header="Видео" />
-                <MenuItem Header="Проект" IsEnabled="False" />
-            </MenuItem>
-        </Menu>
-        <UniformGrid
-            x:Name="Parent"
+        <ToolBarTray
             Grid.Row="0"
-            Grid.RowSpan="2"
-            Grid.Column="1"
-            Rows="1">
-            <local:TeamControl
-                AddCommand="{Binding DataContext.AddPlayerToGuestTeamCommand, ElementName=Parent}"
-                DataContext="{Binding Model.GuestTeam}"
-                RemoveCommand="{Binding DataContext.RemovePlayerFromGuestTeamCommand, ElementName=Parent}" />
-            <local:TeamControl
-                AddCommand="{Binding DataContext.AddPlayerToHomeTeamCommand, ElementName=Parent}"
-                DataContext="{Binding Model.HomeTeam}"
-                RemoveCommand="{Binding DataContext.RemovePlayerFromHomeTeamCommand, ElementName=Parent}" />
-        </UniformGrid>
-        <Grid Grid.Row="2" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
-            <Image
-                Grid.Row="0"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Source="{Binding Frame}" />
-            <UniformGrid
-                Grid.Row="1"
-                Grid.Column="0"
-                Rows="1">
-                <Button Command="{Binding ReversePauseCommand}">
-                    <Button.Style>
-                        <Style BasedOn="{StaticResource MainButtonStyle}" TargetType="{x:Type Button}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Model.IsPaused}" Value="True">
-                                    <Setter Property="Content" Value="{md:PackIcon Kind=Play}" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Model.IsPaused}" Value="False">
-                                    <Setter Property="Content" Value="{md:PackIcon Kind=Pause}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </UniformGrid>
-            <Slider
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="10,20,10,20"
-                IsHitTestVisible="{Binding Model.IsPaused}"
-                Maximum="{Binding Model.VideoReader.FramesCount}"
-                Minimum="0"
-                Value="{Binding Model.FrameNumber}" />
-        </Grid>
+            Grid.Column="0"
+            Grid.ColumnSpan="2">
+            <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
+                <Menu>
+                    <MenuItem Header="Открыть">
+                        <MenuItem Command="{Binding ReadVideoFromFileCommand}" Header="Видео" />
+                        <MenuItem Header="Проект" IsEnabled="False" />
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
+        </ToolBarTray>
+        <DockPanel Grid.Row="1">
+            <md:DrawerHost IsLeftDrawerOpen="{Binding IsChecked, ElementName=showLeftMenu}" OpenMode="Standard">
+                <md:DrawerHost.LeftDrawerContent>
+                    <TabControl
+                        Width="700"
+                        md:NavigationRailAssist.ShowSelectionBackground="True"
+                        SnapsToDevicePixels="True"
+                        Style="{StaticResource MaterialDesignNavigationRailTabControl}"
+                        TabStripPlacement="Left">
+                        <TabControl.Resources>
+                            <Style x:Key="tabIcon" TargetType="md:PackIcon">
+                                <Setter Property="Height" Value="24" />
+                                <Setter Property="Width" Value="24" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                            <Style x:Key="tabText" TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="TextAlignment" Value="Center" />
+                            </Style>
+                        </TabControl.Resources>
+                        <TabItem>
+                            <TabItem.Header>
+                                <StackPanel Width="auto" Height="auto">
+                                    <md:PackIcon Kind="Event" Style="{StaticResource tabIcon}" />
+                                    <TextBlock Style="{StaticResource tabText}" Text="События" />
+                                </StackPanel>
+                            </TabItem.Header>
+                        </TabItem>
+                        <TabItem>
+                            <TabItem.Header>
+                                <StackPanel Width="auto" Height="auto">
+                                    <md:PackIcon Kind="Home" Style="{StaticResource tabIcon}" />
+                                    <TextBlock Style="{StaticResource tabText}" Text="Команда хозяев" />
+                                </StackPanel>
+                            </TabItem.Header>
+                        </TabItem>
+                        <TabItem>
+                            <TabItem.Header>
+                                <StackPanel Width="auto" Height="auto">
+                                    <md:PackIcon Kind="GuestRoom" Style="{StaticResource tabIcon}" />
+                                    <TextBlock Style="{StaticResource tabText}" Text="Команда гостей" />
+                                </StackPanel>
+                            </TabItem.Header>
+                        </TabItem>
+                    </TabControl>
+                </md:DrawerHost.LeftDrawerContent>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <ToggleButton
+                        Name="showLeftMenu"
+                        Margin="15"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        AutomationProperties.Name="HamburgerToggleButton"
+                        IsChecked="False"
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                    <Image
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Source="{Binding Frame}" />
+                    <UniformGrid
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Rows="1">
+                        <Button Content="{md:PackIcon Kind=ArrowLeftBoldCircleOutline}" Style="{StaticResource MainButtonStyle}" />
+                        <Button Command="{Binding ReversePauseCommand}">
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource MainButtonStyle}" TargetType="{x:Type Button}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Model.IsPaused}" Value="True">
+                                            <Setter Property="Content" Value="{md:PackIcon Kind=PlayOutline}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Model.IsPaused}" Value="False">
+                                            <Setter Property="Content" Value="{md:PackIcon Kind=PauseCircleOutline}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button
+                            Command="{Binding StopVideoCommand}"
+                            Content="{md:PackIcon Kind=StopCircleOutline}"
+                            Style="{StaticResource MainButtonStyle}" />
+                        <Button Content="{md:PackIcon Kind=ArrowRightBoldCircleOutline}" Style="{StaticResource MainButtonStyle}" />
+                    </UniformGrid>
+                    <Slider
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Margin="10,20,10,20"
+                        Maximum="{Binding Model.FramesCount}"
+                        Minimum="0"
+                        Value="{Binding Model.FrameNumber}">
+                        <beh:Interaction.Triggers>
+                            <beh:EventTrigger EventName="PreviewMouseDown">
+                                <beh:InvokeCommandAction Command="{Binding UserClickedCommand}">
+                                    <beh:InvokeCommandAction.CommandParameter>
+                                        <s:Boolean>True</s:Boolean>
+                                    </beh:InvokeCommandAction.CommandParameter>
+                                </beh:InvokeCommandAction>
+                            </beh:EventTrigger>
+                            <beh:EventTrigger EventName="PreviewMouseUp">
+                                <beh:InvokeCommandAction Command="{Binding UserClickedCommand}">
+                                    <beh:InvokeCommandAction.CommandParameter>
+                                        <s:Boolean>False</s:Boolean>
+                                    </beh:InvokeCommandAction.CommandParameter>
+                                </beh:InvokeCommandAction>
+                            </beh:EventTrigger>
+                        </beh:Interaction.Triggers>
+                    </Slider>
+                </Grid>
+            </md:DrawerHost>
+        </DockPanel>
+
     </Grid>
 </UserControl>

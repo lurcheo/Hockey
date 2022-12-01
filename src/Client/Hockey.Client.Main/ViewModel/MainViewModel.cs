@@ -8,6 +8,7 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -25,13 +26,17 @@ internal class MainViewModel : ReactiveObject
 
     public ICommand AddPlayerToHomeTeamCommand { get; }
     public ICommand RemovePlayerFromHomeTeamCommand { get; }
+    public ICommand UserClickedCommand { get; }
+    public ICommand StopVideoCommand { get; }
+
+    [Reactive] public CancellationTokenSource LastTokenSource { get; set; }
 
     public MainViewModel(IMainModel model)
     {
         Model = model;
 
         Model.WhenAnyValue(x => x.CurrentFrame)
-             .Select(x => x is null ? default : BitmapSourceConverter.ToBitmapSource(x))
+             .Select(x => x is null || x.IsDisposed ? default : BitmapSourceConverter.ToBitmapSource(x))
              .Subscribe(x => Frame = x)
              .Cache();
 
@@ -46,12 +51,13 @@ internal class MainViewModel : ReactiveObject
                     return;
                 }
 
-                CancellationTokenSource cts = new();
-                await Model.ReadVideoFromFile(openFileDialog.FileName, cts.Token);
+                LastTokenSource = new();
+                await Model.ReadVideoFromFile(openFileDialog.FileName, LastTokenSource.Token);
             }
         );
 
         ReversePauseCommand = ReactiveCommand.Create(() => Model.IsPaused = !Model.IsPaused);
+        UserClickedCommand = ReactiveCommand.Create<bool>(x => Model.IsUserClick = x);
 
         AddPlayerToGuestTeamCommand = ReactiveCommand.Create(() => AddPlayerToTeam(Model.GuestTeam));
         RemovePlayerFromGuestTeamCommand = ReactiveCommand.Create<PlayerModel>(x => RemovePlayerFromTeam(Model.GuestTeam, x));

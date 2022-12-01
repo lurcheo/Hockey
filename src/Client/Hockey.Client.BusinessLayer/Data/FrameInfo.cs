@@ -1,4 +1,5 @@
 ﻿using OpenCvSharp;
+using System;
 
 namespace Hockey.Client.BusinessLayer.Data;
 

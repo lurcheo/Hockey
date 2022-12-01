@@ -1,10 +1,13 @@
 ﻿using Hockey.Client.BusinessLayer.Abstraction;
+using Hockey.Client.BusinessLayer.Data;
 using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Shared.Extensions;
 using OpenCvSharp;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
+using System.Diagnostics;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,8 +24,10 @@ internal class MainModel : ReactiveObject, IMainModel
 
     [Reactive] public Mat CurrentFrame { get; set; }
     [Reactive] public bool IsPaused { get; set; }
-    [Reactive] public long FrameNumber { get; set; }
-    [Reactive] public IVideoReader VideoReader { get; set; }
+    [Reactive] public bool IsUserClick { get; set; }
+    [Reactive] public long FrameNumber { get; set; } = 0;
+    [Reactive] public long FramesCount { get; set; } = 100;
+    private IVideoReader _videoReader { get; set; }
 
     public MainModel(IVideoService videoService)
     {
@@ -33,9 +38,33 @@ internal class MainModel : ReactiveObject, IMainModel
         HomeTeam = new() { Name = "Команда хозяев" };
 
         this.WhenAnyValue(x => x.FrameNumber)
-            .Where(_ => VideoReader is not null && IsPaused)
-            .Throttle(TimeSpan.FromMilliseconds(500))
-            .Subscribe(x => VideoReader.SetPosition(x))
+            .Where(_ => _videoReader is not null && IsUserClick)
+            .Throttle(TimeSpan.FromMilliseconds(200))
+            .ObserveOnDispatcher()
+            .Subscribe(x =>
+            {
+                lock (this)
+                {
+                    _videoReader.SetPosition(x);
+
+                    FrameInfo info = null;
+                    lock (this)
+                    {
+                        info = _videoReader.GetFrame();
+                    }
+
+                    if (info == default)
+                    {
+                        return;
+                    }
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        FrameNumber = info.FrameNumber;
+                        CurrentFrame = info.Frame;
+                    });
+                }
+            })
             .Cache();
     }
 
@@ -45,27 +74,44 @@ internal class MainModel : ReactiveObject, IMainModel
         (
             async () =>
             {
-                VideoReader?.Dispose();
-                VideoReader = _videoService.ReadVideoFromFile(fileName);
+                _videoReader?.Dispose();
+                _videoReader = _videoService.ReadVideoFromFile(fileName);
+                FramesCount = _videoReader.FramesCount;
 
-                foreach (var frameInfo in VideoReader)
+                var st = Stopwatch.StartNew();
+
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    await Application.Current.Dispatcher.Invoke
-                    (
-                        async () =>
-                        {
-                            (CurrentFrame, FrameNumber) = frameInfo;
-
-                            while (IsPaused)
-                            {
-                                await Task.Delay(100);
-                            }
-                        }
-                    );
-
-                    if (cancellationToken.IsCancellationRequested)
+                    while (IsPaused || IsUserClick)
                     {
-                        break;
+                        await Task.Delay(100);
+                        continue;
+                    }
+
+                    st.Restart();
+
+                    FrameInfo info = null;
+                    lock (this)
+                    {
+                        info = _videoReader.GetFrame();
+                    }
+
+                    if (info == default)
+                    {
+                        continue;
+                    }
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        FrameNumber = info.FrameNumber;
+                        CurrentFrame = info.Frame;
+                    });
+
+                    int delay = (int)(_videoReader.MillisecondsPerFrame - st.ElapsedMilliseconds);
+
+                    if (delay > 0)
+                    {
+                        Thread.Sleep(delay);
                     }
                 }
             }

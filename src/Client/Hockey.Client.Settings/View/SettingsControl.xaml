@@ -9,7 +9,7 @@
     xmlns:vm="clr-namespace:Hockey.Client.Settings.ViewModel"
     d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
     mc:Ignorable="d">
-    <StackPanel Orientation="Horizontal">
+    <StackPanel Margin="20" Orientation="Horizontal">
         <StackPanel.Resources>
             <Style
                 x:Key="SettingsButtonStyle"
@@ -36,22 +36,5 @@
                 <SolidColorBrush Color="Wheat" />
             </md:ToggleButtonAssist.SwitchTrackOffBackground>
         </ToggleButton>
-        <Button Command="{Binding ReverseWindowStateCommand}" Foreground="{DynamicResource MaterialDesignBackground}">
-            <Button.Style>
-                <Style BasedOn="{StaticResource SettingsButtonStyle}" TargetType="{x:Type Button}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Model.IsMaximized}" Value="True">
-                            <Setter Property="Content" Value="{md:PackIcon Kind=WindowMinimize}" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Model.IsMaximized}" Value="False">
-                            <Setter Property="Content" Value="{md:PackIcon Kind=WindowMaximize}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
-        <Button Command="{Binding CloseCommand}">
-            <md:PackIcon Foreground="{DynamicResource MaterialDesignBackground}" Kind="Power" />
-        </Button>
     </StackPanel>
 </UserControl>
