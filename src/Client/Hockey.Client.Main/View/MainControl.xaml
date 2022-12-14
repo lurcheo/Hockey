@@ -54,7 +54,6 @@
                     <TabControl
                         Width="700"
                         md:NavigationRailAssist.ShowSelectionBackground="True"
-                        SelectedIndex="{Binding TabIndex}"
                         SnapsToDevicePixels="True"
                         Style="{StaticResource MaterialDesignNavigationRailTabControl}"
                         TabStripPlacement="Left">
@@ -77,16 +76,7 @@
                                     <TextBlock Style="{StaticResource tabText}" Text="События" />
                                 </StackPanel>
                             </TabItem.Header>
-                            <local:EventsControl AddEventCommand="{Binding AddEventCommand}" EventTypes="{Binding Model.EventTypes}" />
-                        </TabItem>
-                        <TabItem>
-                            <TabItem.Header>
-                                <StackPanel Width="auto" Height="auto">
-                                    <md:PackIcon Kind="Edit" Style="{StaticResource tabIcon}" />
-                                    <TextBlock Style="{StaticResource tabText}" Text="Событие" />
-                                </StackPanel>
-                            </TabItem.Header>
-                            <local:EditEventControl Event="{Binding CurrentEvent}" ShowEventCommand="{Binding ShowEventCommand}" />
+                            <ContentControl prism:RegionManager.RegionName="{x:Static local:Regions.EventsCreating}" />
                         </TabItem>
                         <TabItem>
                             <TabItem.Header>
@@ -95,7 +85,7 @@
                                     <TextBlock Style="{StaticResource tabText}" Text="Команда хозяев" />
                                 </StackPanel>
                             </TabItem.Header>
-                            <local:TeamControl Team="{Binding Model.HomeTeam}" />
+                            <ContentControl prism:RegionManager.RegionName="{x:Static local:Regions.HomeTeam}" />
                         </TabItem>
                         <TabItem>
                             <TabItem.Header>
@@ -104,15 +94,12 @@
                                     <TextBlock Style="{StaticResource tabText}" Text="Команда гостей" />
                                 </StackPanel>
                             </TabItem.Header>
-                            <local:TeamControl Team="{Binding Model.GuestTeam}" />
+                            <ContentControl prism:RegionManager.RegionName="{x:Static local:Regions.GuestTeam}" />
                         </TabItem>
                     </TabControl>
                 </md:DrawerHost.LeftDrawerContent>
                 <md:DrawerHost.RightDrawerContent>
-                    <local:GameEventsControl
-                        Width="300"
-                        EditEventCommand="{Binding EditEventCommand}"
-                        Events="{Binding Model.Events}" />
+                    <ContentControl Width="300" prism:RegionManager.RegionName="{x:Static local:Regions.Events}" />
                 </md:DrawerHost.RightDrawerContent>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -127,6 +114,16 @@
                         Name="showLeftMenu"
                         Margin="15"
                         HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        AutomationProperties.Name="HamburgerToggleButton"
+                        IsChecked="False"
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                    <ToggleButton
+                        Name="showRightMenu"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Margin="15"
+                        HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         AutomationProperties.Name="HamburgerToggleButton"
                         IsChecked="False"
@@ -186,16 +183,6 @@
                             </beh:EventTrigger>
                         </beh:Interaction.Triggers>
                     </Slider>
-                    <ToggleButton
-                        Name="showRightMenu"
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Margin="15"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        AutomationProperties.Name="HamburgerToggleButton"
-                        IsChecked="False"
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                 </Grid>
             </md:DrawerHost>
         </DockPanel>

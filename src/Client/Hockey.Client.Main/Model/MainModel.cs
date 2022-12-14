@@ -1,19 +1,14 @@
 ﻿using Hockey.Client.BusinessLayer.Abstraction;
 using Hockey.Client.BusinessLayer.Data;
 using Hockey.Client.Main.Model.Abstraction;
-using Hockey.Client.Main.Model.Events;
 using Hockey.Client.Shared.Extensions;
 using OpenCvSharp;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,11 +18,6 @@ namespace Hockey.Client.Main.Model;
 internal class MainModel : ReactiveObject, IMainModel
 {
     private readonly IVideoService _videoService;
-
-    public TeamModel GuestTeam { get; } = new() { Name = "Команда гостей" };
-    public TeamModel HomeTeam { get; } = new() { Name = "Команда хозяев" };
-    public ObservableCollection<EventModel> Events { get; } = new();
-    public IEnumerable<EventTypeModel> EventTypes { get; }
 
     [Reactive] public Mat CurrentFrame { get; set; }
     [Reactive] public bool IsPaused { get; set; }
@@ -39,14 +29,6 @@ internal class MainModel : ReactiveObject, IMainModel
     public MainModel(IVideoService videoService)
     {
         _videoService = videoService;
-        EventTypes = Enum.GetValues<EventType>().Select(x =>
-        {
-            var memberInfos = typeof(EventType).GetMember(x.ToString())[0];
-            var description = memberInfos.GetCustomAttribute<DescriptionAttribute>().Description;
-
-            return new EventTypeModel(x, description);
-        }).ToArray();
-
 
         this.WhenAnyValue(x => x.FrameNumber)
             .Where(_ => _videoReader is not null && IsUserClick)
