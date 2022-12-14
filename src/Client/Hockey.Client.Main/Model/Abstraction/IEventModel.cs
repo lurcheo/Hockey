@@ -11,4 +11,5 @@ internal interface IEventModel : IReactiveObject
     ObservableCollection<EventInfo> Events { get; set; }
     ObservableCollection<EventFactory> EventFactories { get; set; }
     IEnumerable<TeamInfo> Teams { get; set; }
+    EventInfo CreateEvent(EventFactory factory);
 }

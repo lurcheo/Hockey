@@ -7,6 +7,7 @@
     xmlns:ev="clr-namespace:Hockey.Client.Main.Model.Data.Events"
     xmlns:local="clr-namespace:Hockey.Client.Main.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:vm="clr-namespace:Hockey.Client.Main.ViewModel"
     Name="Root"
     d:DataContext="{d:DesignInstance vm:EventsViewModel}"
@@ -14,16 +15,45 @@
     d:Width="300"
     Style="{StaticResource MaterialDesignUserControl}"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
+            <Setter Property="Margin" Value="5" />
+        </Style>
+        <Style x:Key="parametersBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDarkSeparatorBackground}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Margin" Value="5,7" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1.5*" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Header="События">
-            <ListView ItemsSource="{Binding Model.Events}" SelectedItem="{Binding SelectedEvent}">
+            <ListView
+                HorizontalContentAlignment="Center"
+                ItemsSource="{Binding Model.Events}"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                SelectedItem="{Binding SelectedEvent}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Description}" />
+                        <Border Style="{StaticResource parametersBorder}">
+                            <UniformGrid Columns="2">
+                                <TextBox md:HintAssist.Hint="Тип события" Text="{Binding EventType.Name}" />
+                                <TextBox md:HintAssist.Hint="Описание события" Text="{Binding Description}" />
+                                <TextBox
+                                    md:HintAssist.Hint="Время начала"
+                                    IsReadOnly="True"
+                                    Text="{Binding StartEventTime, Mode=OneWay}" />
+                                <TextBox
+                                    md:HintAssist.Hint="Время конца"
+                                    IsReadOnly="True"
+                                    Text="{Binding EndEventTime, Mode=OneWay}" />
+                            </UniformGrid>
+                        </Border>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
@@ -35,22 +65,32 @@
             <ScrollViewer>
                 <ItemsControl ItemsSource="{Binding SelectedEvent.Parameters}">
                     <ItemsControl.Resources>
+                        <Style BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}" TargetType="ComboBox" />
                         <DataTemplate DataType="{x:Type ev:PlayerEventParameter}">
-                            <UniformGrid Columns="2">
-                                <TextBlock Text="Команда" />
+                            <Border Style="{StaticResource parametersBorder}">
+                                <StackPanel>
+                                    <ComboBox
+                                        md:HintAssist.Hint="Команда"
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
+                                        SelectedValue="{Binding Team}" />
+                                    <ComboBox
+                                        md:HintAssist.Hint="{Binding Name}"
+                                        DisplayMemberPath="Name"
+                                        IsEnabled="{Binding Team, Converter={cv:NullableConverter}, ConverterParameter=reverse}"
+                                        ItemsSource="{Binding Team.Players}"
+                                        SelectedValue="{Binding Player}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type ev:TeamEventParameter}">
+                            <Border Style="{StaticResource parametersBorder}">
                                 <ComboBox
+                                    md:HintAssist.Hint="{Binding Name}"
                                     DisplayMemberPath="Name"
                                     ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
                                     SelectedValue="{Binding Team}" />
-                                <TextBlock Text="{Binding Name}" />
-                                <ComboBox
-                                    DisplayMemberPath="Name"
-                                    ItemsSource="{Binding Team.Players}"
-                                    SelectedValue="{Binding Player}" />
-                            </UniformGrid>
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type ev:TeamEventParameter}">
-                            <TextBlock />
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.Resources>
                 </ItemsControl>

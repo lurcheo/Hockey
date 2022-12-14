@@ -17,23 +17,28 @@ namespace Hockey.Client.Main.Model;
 
 internal class MainModel : ReactiveObject, IMainModel
 {
-    private readonly IVideoService _videoService;
+    public IVideoService VideoService { get; }
+    public IGameStore GameStore { get; }
 
     [Reactive] public Mat CurrentFrame { get; set; }
     [Reactive] public bool IsPaused { get; set; }
     [Reactive] public bool IsUserClick { get; set; }
     [Reactive] public long FrameNumber { get; set; } = 0;
     [Reactive] public long FramesCount { get; set; } = 100;
-    private IVideoReader _videoReader { get; set; }
 
-    public MainModel(IVideoService videoService)
+    private IVideoReader videoReader;
+
+
+    public MainModel(IVideoService videoService, IGameStore gameStore)
     {
-        _videoService = videoService;
+        VideoService = videoService;
+        GameStore = gameStore;
 
         this.WhenAnyValue(x => x.FrameNumber)
-            .Where(_ => _videoReader is not null && IsUserClick)
+            .Where(_ => videoReader is not null && IsUserClick)
             .Throttle(TimeSpan.FromMilliseconds(200))
             .ObserveOnDispatcher()
+            .Do(x => GameStore.FrameNumber = x)
             .Subscribe(SetPosition)
             .Cache();
     }
@@ -42,12 +47,12 @@ internal class MainModel : ReactiveObject, IMainModel
     {
         lock (this)
         {
-            _videoReader.SetPosition(position);
+            videoReader.SetPosition(position);
 
             FrameInfo info = null;
             lock (this)
             {
-                info = _videoReader.GetFrame();
+                info = videoReader.GetFrame();
             }
 
             if (info == default)
@@ -69,9 +74,10 @@ internal class MainModel : ReactiveObject, IMainModel
         (
             async () =>
             {
-                _videoReader?.Dispose();
-                _videoReader = _videoService.ReadVideoFromFile(fileName);
-                FramesCount = _videoReader.FramesCount;
+                videoReader?.Dispose();
+                videoReader = VideoService.ReadVideoFromFile(fileName);
+                GameStore.MillisecondsPerFrame = videoReader.MillisecondsPerFrame;
+                FramesCount = videoReader.FramesCount;
 
                 var st = Stopwatch.StartNew();
 
@@ -88,7 +94,7 @@ internal class MainModel : ReactiveObject, IMainModel
                     FrameInfo info = null;
                     lock (this)
                     {
-                        info = _videoReader.GetFrame();
+                        info = videoReader.GetFrame();
                     }
 
                     if (info == default)
@@ -102,7 +108,7 @@ internal class MainModel : ReactiveObject, IMainModel
                         CurrentFrame = info.Frame;
                     });
 
-                    int delay = (int)(_videoReader.MillisecondsPerFrame - st.ElapsedMilliseconds);
+                    int delay = (int)(videoReader.MillisecondsPerFrame - st.ElapsedMilliseconds);
 
                     if (delay > 0)
                     {

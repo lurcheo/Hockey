@@ -15,21 +15,35 @@ internal class EventModel : ReactiveObject, IEventModel
     [Reactive] public ObservableCollection<EventInfo> Events { get; set; }
     [Reactive] public ObservableCollection<EventFactory> EventFactories { get; set; }
     [Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
+    public IGameStore Store { get; }
 
     public EventModel(IGameStore store)
     {
-        store.WhenAnyValue(x => x.Events)
+        Store = store;
+
+        Store.WhenAnyValue(x => x.Events)
              .Subscribe(x => Events = x)
              .Cache();
 
-        store.WhenAnyValue(x => x.EventFactories)
+        Store.WhenAnyValue(x => x.EventFactories)
              .Subscribe(x => EventFactories = x)
              .Cache();
 
-        store.WhenAnyValue(x => x.HomeTeam,
+        Store.WhenAnyValue(x => x.HomeTeam,
                            x => x.GuestTeam,
                            (home, guest) => new[] { home, guest })
             .Subscribe(x => Teams = x)
             .Cache();
+    }
+
+    public EventInfo CreateEvent(EventFactory factory)
+    {
+        var eventInfo = factory.Create();
+        eventInfo.MillisecondsPerFrame = Store.MillisecondsPerFrame;
+
+        eventInfo.StartEventFrameNumber = Store.FrameNumber;
+        eventInfo.EndEventFrameNumber = eventInfo.StartEventFrameNumber + (long)(eventInfo.DefaultDuration.TotalMilliseconds / eventInfo.MillisecondsPerFrame);
+
+        return eventInfo;
     }
 }

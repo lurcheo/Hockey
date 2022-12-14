@@ -2,6 +2,7 @@
 using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
 using Hockey.Client.Shared.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,26 +23,36 @@ internal class GameStoreProvider : IGameStoreProvider
         return new EventFactory[]
         {
             new EventFactory(new EventType("Гол"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new PlayerEventParameter("Забивший"),
                                                                          new PlayerEventParameter("Ассистент"))),
             new EventFactory(new EventType("Толчок"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new PlayerEventParameter("Провинившийся"),
                                                                          new PlayerEventParameter("Жертва"))),
             new EventFactory(new EventType("Игра в меньшистве"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new TeamEventParameter())),
             new EventFactory(new EventType("Игра в большинстве"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new TeamEventParameter())),
             new EventFactory(new EventType("Гол1"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new PlayerEventParameter())),
             new EventFactory(new EventType("Гол2"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new PlayerEventParameter())),
             new EventFactory(new EventType("Гол3"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new PlayerEventParameter())),
             new EventFactory(new EventType("Гол4"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new PlayerEventParameter())),
             new EventFactory(new EventType("Гол5"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new PlayerEventParameter())),
             new EventFactory(new EventType("Гол6"), type => new EventInfo(type,
+                                                                         TimeSpan.FromSeconds(10),
                                                                          new PlayerEventParameter())),
         };
     }

@@ -99,7 +99,7 @@
                     </TabControl>
                 </md:DrawerHost.LeftDrawerContent>
                 <md:DrawerHost.RightDrawerContent>
-                    <ContentControl Width="300" prism:RegionManager.RegionName="{x:Static local:Regions.Events}" />
+                    <ContentControl Width="320" prism:RegionManager.RegionName="{x:Static local:Regions.Events}" />
                 </md:DrawerHost.RightDrawerContent>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -127,7 +127,12 @@
                         VerticalAlignment="Top"
                         AutomationProperties.Name="HamburgerToggleButton"
                         IsChecked="False"
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                        RenderTransformOrigin="0.5,0.5"
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}">
+                        <ToggleButton.RenderTransform>
+                            <ScaleTransform ScaleX="-1" />
+                        </ToggleButton.RenderTransform>
+                    </ToggleButton>
                     <Image
                         Grid.Row="0"
                         Grid.Column="0"

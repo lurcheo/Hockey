@@ -18,7 +18,7 @@ internal class EventsViewModel : ReactiveObject
 	{
 		Model = model;
 
-		AddEventCommand = ReactiveCommand.Create<EventFactory>(x => Model.Events.Add(x.Create()));
+		AddEventCommand = ReactiveCommand.Create<EventFactory>(x => Model.Events.Add(Model.CreateEvent(x)));
 
 		RemoveEventCommand = ReactiveCommand.Create<EventInfo>(x => Model.Events.Remove(x));
 	}

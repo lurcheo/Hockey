@@ -12,4 +12,6 @@ internal interface IGameStore : IReactiveObject
 
     TeamInfo HomeTeam { get; set; }
     TeamInfo GuestTeam { get; set; }
+    long FrameNumber { get; set; }
+    int MillisecondsPerFrame { get; set; }
 }
