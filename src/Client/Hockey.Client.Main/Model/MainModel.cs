@@ -1,8 +1,12 @@
 ﻿using Hockey.Client.BusinessLayer.Abstraction;
 using Hockey.Client.BusinessLayer.Data;
+using Hockey.Client.Main.Events;
 using Hockey.Client.Main.Model.Abstraction;
+using Hockey.Client.Main.Model.Data;
+using Hockey.Client.Main.Model.Data.Events;
 using Hockey.Client.Shared.Extensions;
 using OpenCvSharp;
+using Prism.Events;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
@@ -19,28 +23,40 @@ internal class MainModel : ReactiveObject, IMainModel
 {
     public IVideoService VideoService { get; }
     public IGameStore GameStore { get; }
-
+    public IEventAggregator EventAggregator { get; }
     [Reactive] public Mat CurrentFrame { get; set; }
     [Reactive] public bool IsPaused { get; set; }
     [Reactive] public bool IsUserClick { get; set; }
+    [Reactive] public bool IsPlayEvent { get; set; } = false;
+
     [Reactive] public long FrameNumber { get; set; } = 0;
+    [Reactive] public int MillisecondsPerFrame { get; set; } = 0;
+    [Reactive] public long EndFrameNumber { get; set; } = 0;
+    [Reactive] public PlayingState PlayingState { get; set; }
+
     [Reactive] public long FramesCount { get; set; } = 100;
 
     private IVideoReader videoReader;
 
 
-    public MainModel(IVideoService videoService, IGameStore gameStore)
+    public MainModel(IVideoService videoService, IGameStore gameStore, IEventAggregator eventAggregator)
     {
         VideoService = videoService;
         GameStore = gameStore;
+        EventAggregator = eventAggregator;
 
         this.WhenAnyValue(x => x.FrameNumber)
+            .Do(x => GameStore.FrameNumber = x)
             .Where(_ => videoReader is not null && IsUserClick)
             .Throttle(TimeSpan.FromMilliseconds(200))
             .ObserveOnDispatcher()
-            .Do(x => GameStore.FrameNumber = x)
             .Subscribe(SetPosition)
             .Cache();
+
+        EventAggregator.GetEvent<PlayEvent>()
+                       .ToObservable()
+                       .Subscribe(PlayEvent)
+                       .Cache();
     }
 
     public void SetPosition(long position)
@@ -68,6 +84,7 @@ internal class MainModel : ReactiveObject, IMainModel
         }
     }
 
+
     public Task ReadVideoFromFile(string fileName, CancellationToken cancellationToken)
     {
         return Task.Run
@@ -75,14 +92,29 @@ internal class MainModel : ReactiveObject, IMainModel
             async () =>
             {
                 videoReader?.Dispose();
+
                 videoReader = VideoService.ReadVideoFromFile(fileName);
-                GameStore.MillisecondsPerFrame = videoReader.MillisecondsPerFrame;
+
+                PlayingState = PlayingState.PlayVideo;
+                MillisecondsPerFrame = videoReader.MillisecondsPerFrame;
                 FramesCount = videoReader.FramesCount;
+
+                GameStore.MillisecondsPerFrame = MillisecondsPerFrame;
 
                 var st = Stopwatch.StartNew();
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
+                    lock (this)
+                    {
+                        if (PlayingState == PlayingState.PlayEvent && FrameNumber >= EndFrameNumber)
+                        {
+                            IsPaused = true;
+                            PlayingState = PlayingState.PlayVideo;
+                            IsPlayEvent = false;
+                        }
+                    }
+
                     while (IsPaused || IsUserClick)
                     {
                         await Task.Delay(100);
@@ -117,5 +149,18 @@ internal class MainModel : ReactiveObject, IMainModel
                 }
             }
         );
+    }
+
+    public void PlayEvent(EventInfo eventInfo)
+    {
+        SetPosition(eventInfo.StartEventFrameNumber);
+
+        lock (this)
+        {
+            EndFrameNumber = eventInfo.EndEventFrameNumber;
+            PlayingState = PlayingState.PlayEvent;
+            IsPaused = false;
+            IsPlayEvent = true;
+        }
     }
 }

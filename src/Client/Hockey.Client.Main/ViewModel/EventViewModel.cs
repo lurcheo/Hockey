@@ -11,6 +11,7 @@ internal class EventsViewModel : ReactiveObject
 
 	public ICommand AddEventCommand { get; }
 	public ICommand RemoveEventCommand { get; }
+	public ICommand PlayEventCommand { get; }
 
 	[Reactive] public EventInfo SelectedEvent { get; set; }
 
@@ -18,8 +19,9 @@ internal class EventsViewModel : ReactiveObject
 	{
 		Model = model;
 
-		AddEventCommand = ReactiveCommand.Create<EventFactory>(x => Model.Events.Add(Model.CreateEvent(x)));
-
+		AddEventCommand = ReactiveCommand.Create<DefaultEventFactory>(x => Model.Events.Add(Model.CreateEvent(x)));
 		RemoveEventCommand = ReactiveCommand.Create<EventInfo>(x => Model.Events.Remove(x));
+
+		PlayEventCommand = ReactiveCommand.Create<EventInfo>(Model.PlayEvent);
 	}
 }

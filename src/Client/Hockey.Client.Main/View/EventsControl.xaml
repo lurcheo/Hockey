@@ -34,25 +34,74 @@
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Header="События">
             <ListView
-                HorizontalContentAlignment="Center"
+                HorizontalContentAlignment="Stretch"
                 ItemsSource="{Binding Model.Events}"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 SelectedItem="{Binding SelectedEvent}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border Style="{StaticResource parametersBorder}">
-                            <UniformGrid Columns="2">
-                                <TextBox md:HintAssist.Hint="Тип события" Text="{Binding EventType.Name}" />
-                                <TextBox md:HintAssist.Hint="Описание события" Text="{Binding Description}" />
-                                <TextBox
-                                    md:HintAssist.Hint="Время начала"
-                                    IsReadOnly="True"
-                                    Text="{Binding StartEventTime, Mode=OneWay}" />
-                                <TextBox
-                                    md:HintAssist.Hint="Время конца"
-                                    IsReadOnly="True"
-                                    Text="{Binding EndEventTime, Mode=OneWay}" />
-                            </UniformGrid>
+                        <Border Margin="0" Style="{StaticResource parametersBorder}">
+                            <Grid>
+                                <Grid.Resources>
+                                    <Style BasedOn="{StaticResource IconButton}" TargetType="Button">
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Width" Value="20" />
+                                        <Setter Property="Height" Value="20" />
+                                    </Style>
+                                </Grid.Resources>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding EventType.Name}" />
+                                <TextBlock Grid.Row="1" Grid.Column="0">
+                                    <Run>
+                                        <Run.Text>
+                                            <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
+                                                <Binding Path="StartEventFrameNumber" />
+                                                <Binding Path="MillisecondsPerFrame" />
+                                            </MultiBinding>
+                                        </Run.Text>
+                                    </Run>
+                                    <Run Text="-" />
+                                    <Run>
+                                        <Run.Text>
+                                            <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
+                                                <Binding Path="EndEventFrameNumber" />
+                                                <Binding Path="MillisecondsPerFrame" />
+                                            </MultiBinding>
+                                        </Run.Text>
+                                    </Run>
+                                </TextBlock>
+                                <Button
+                                    Grid.Row="0"
+                                    Grid.RowSpan="2"
+                                    Grid.Column="1"
+                                    Command="{Binding DataContext.PlayEventCommand, ElementName=Root}"
+                                    CommandParameter="{Binding}"
+                                    Content="{md:PackIcon Kind=PlayOutline,
+                                                          Size=20}" />
+                                <Button
+                                    Grid.Row="0"
+                                    Grid.RowSpan="2"
+                                    Grid.Column="2"
+                                    Command="{Binding DataContext.RemoveEventCommand, ElementName=Root}"
+                                    CommandParameter="{Binding}"
+                                    Content="{md:PackIcon Kind=Trash,
+                                                          Size=18}"
+                                    Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" />
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -60,40 +109,83 @@
         </GroupBox>
         <GroupBox
             Grid.Row="1"
-            Header="{Binding SelectedEvent.Description, FallbackValue='Событие'}"
+            Header="Параметры события"
             IsEnabled="{Binding SelectedEvent, Converter={cv:NullableConverter}, ConverterParameter=reverse}">
             <ScrollViewer>
-                <ItemsControl ItemsSource="{Binding SelectedEvent.Parameters}">
-                    <ItemsControl.Resources>
-                        <Style BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}" TargetType="ComboBox" />
-                        <DataTemplate DataType="{x:Type ev:PlayerEventParameter}">
-                            <Border Style="{StaticResource parametersBorder}">
-                                <StackPanel>
-                                    <ComboBox
-                                        md:HintAssist.Hint="Команда"
-                                        DisplayMemberPath="Name"
-                                        ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
-                                        SelectedValue="{Binding Team}" />
+                <StackPanel>
+                    <Border Style="{StaticResource parametersBorder}">
+                        <TextBox
+                            md:HintAssist.Hint="Время начала события"
+                            DataContext="{Binding SelectedEvent}"
+                            IsHitTestVisible="False"
+                            IsReadOnly="True">
+                            <TextBox.Text>
+                                <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
+                                    <Binding Path="StartEventFrameNumber" />
+                                    <Binding Path="MillisecondsPerFrame" />
+                                </MultiBinding>
+                            </TextBox.Text>
+                        </TextBox>
+                    </Border>
+                    <Border Style="{StaticResource parametersBorder}">
+                        <TextBox
+                            md:HintAssist.Hint="Время конца события"
+                            DataContext="{Binding SelectedEvent}"
+                            IsHitTestVisible="False"
+                            IsReadOnly="True">
+                            <TextBox.Text>
+                                <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
+                                    <Binding Path="EndEventFrameNumber" />
+                                    <Binding Path="MillisecondsPerFrame" />
+                                </MultiBinding>
+                            </TextBox.Text>
+                        </TextBox>
+                    </Border>
+                    <ItemsControl ItemsSource="{Binding SelectedEvent.Parameters}">
+                        <ItemsControl.Resources>
+                            <Style BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}" TargetType="ComboBox" />
+                            <DataTemplate DataType="{x:Type ev:PlayerEventParameter}">
+                                <Border Style="{StaticResource parametersBorder}">
+                                    <StackPanel>
+                                        <ComboBox
+                                            md:HintAssist.Hint="Команда"
+                                            DisplayMemberPath="Name"
+                                            ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
+                                            SelectedValue="{Binding Team}" />
+                                        <ComboBox
+                                            md:HintAssist.Hint="{Binding Name}"
+                                            IsEnabled="{Binding Team, Converter={cv:NullableConverter}, ConverterParameter=reverse}"
+                                            ItemsSource="{Binding Team.Players}"
+                                            SelectedValue="{Binding Player}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock>
+                                                        <Run Text="{Binding Name}" />
+                                                        <Run Text="{Binding Number, StringFormat='{}№{0}'}" />
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type ev:TeamEventParameter}">
+                                <Border Style="{StaticResource parametersBorder}">
                                     <ComboBox
                                         md:HintAssist.Hint="{Binding Name}"
                                         DisplayMemberPath="Name"
-                                        IsEnabled="{Binding Team, Converter={cv:NullableConverter}, ConverterParameter=reverse}"
-                                        ItemsSource="{Binding Team.Players}"
-                                        SelectedValue="{Binding Player}" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type ev:TeamEventParameter}">
-                            <Border Style="{StaticResource parametersBorder}">
-                                <ComboBox
-                                    md:HintAssist.Hint="{Binding Name}"
-                                    DisplayMemberPath="Name"
-                                    ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
-                                    SelectedValue="{Binding Team}" />
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.Resources>
-                </ItemsControl>
+                                        ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
+                                        SelectedValue="{Binding Team}" />
+                                </Border>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type ev:TextEventParameter}">
+                                <Border Style="{StaticResource parametersBorder}">
+                                    <TextBox md:HintAssist.Hint="{Binding Name}" Text="{Binding Text}" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.Resources>
+                    </ItemsControl>
+                </StackPanel>
             </ScrollViewer>
         </GroupBox>
     </Grid>

@@ -9,7 +9,8 @@ namespace Hockey.Client.Main.Model.Abstraction;
 internal interface IEventModel : IReactiveObject
 {
     ObservableCollection<EventInfo> Events { get; set; }
-    ObservableCollection<EventFactory> EventFactories { get; set; }
+    ObservableCollection<IEventFactory> EventFactories { get; set; }
     IEnumerable<TeamInfo> Teams { get; set; }
-    EventInfo CreateEvent(EventFactory factory);
+    EventInfo CreateEvent(DefaultEventFactory factory);
+    void PlayEvent(EventInfo eventInfo);
 }

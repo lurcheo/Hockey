@@ -34,7 +34,7 @@ internal class MainViewModel : ReactiveObject
              .Subscribe(x => Frame = x)
              .Cache();
 
-        ReadVideoFromFileCommand = ReactiveCommand.CreateFromTask
+        ReadVideoFromFileCommand = ReactiveCommand.Create
         (
             async () =>
             {
@@ -45,10 +45,13 @@ internal class MainViewModel : ReactiveObject
                     return;
                 }
 
+                LastTokenSource?.Cancel();
                 LastTokenSource = new();
                 await Model.ReadVideoFromFile(openFileDialog.FileName, LastTokenSource.Token);
             }
         );
+
+        StopVideoCommand = ReactiveCommand.Create(() => LastTokenSource.Cancel());
 
         ReversePauseCommand = ReactiveCommand.Create(() => Model.IsPaused = !Model.IsPaused);
         UserClickedCommand = ReactiveCommand.Create<bool>(x => Model.IsUserClick = x);

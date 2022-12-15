@@ -18,41 +18,51 @@ internal class GameStoreProvider : IGameStoreProvider
                              GetDefaultGuestTeam());
     }
 
-    private static IEnumerable<EventFactory> GetDefaultEventFactories()
+    private static IEnumerable<IEventFactory> GetDefaultEventFactories()
     {
-        return new EventFactory[]
+        return new DefaultEventFactory[]
         {
-            new EventFactory(new EventType("Гол"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Гол"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter("Забивший"),
                                                                          new PlayerEventParameter("Ассистент"))),
-            new EventFactory(new EventType("Толчок"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Толчок"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter("Провинившийся"),
                                                                          new PlayerEventParameter("Жертва"))),
-            new EventFactory(new EventType("Игра в меньшистве"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Игра в меньшистве"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new TeamEventParameter())),
-            new EventFactory(new EventType("Игра в большинстве"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Игра в большинстве"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new TeamEventParameter())),
-            new EventFactory(new EventType("Гол1"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Гол1"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter())),
-            new EventFactory(new EventType("Гол2"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Гол2"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter())),
-            new EventFactory(new EventType("Гол3"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Гол3"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter())),
-            new EventFactory(new EventType("Гол4"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Гол4"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter())),
-            new EventFactory(new EventType("Гол5"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Гол5"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter())),
-            new EventFactory(new EventType("Гол6"), type => new EventInfo(type,
+            new DefaultEventFactory(new EventType("Гол6"), type => new EventInfo(type,
                                                                          TimeSpan.FromSeconds(10),
+                                                                         new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter())),
         };
     }
@@ -60,14 +70,14 @@ internal class GameStoreProvider : IGameStoreProvider
     private static TeamInfo GetDefaultHomeTeam()
     {
         return new("Команда хозяев", Enumerable.Range(1, 10)
-                                               .Select(x => new PlayerInfo($"Игрок {x}", x, PlayerPosition.AttackPlayer))
+                                               .Select(x => new PlayerInfo($"Игрок хозяев {x}", x, (PlayerPosition)(x % 4)))
                                                .ToArray());
     }
 
     private static TeamInfo GetDefaultGuestTeam()
     {
-        return new("Команда гостей", Enumerable.Range(100, 10)
-                                               .Select(x => new PlayerInfo($"Игрок {x}", x, PlayerPosition.AttackPlayer))
+        return new("Команда гостей", Enumerable.Range(1, 10)
+                                               .Select(x => new PlayerInfo($"Игрок гостей {x}", x, (PlayerPosition)(x % 4)))
                                                .ToArray());
     }
 }

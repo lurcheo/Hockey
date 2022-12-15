@@ -1,7 +1,9 @@
-﻿using Hockey.Client.Main.Model.Abstraction;
+﻿using Hockey.Client.Main.Events;
+using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
 using Hockey.Client.Shared.Extensions;
+using Prism.Events;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
@@ -13,14 +15,15 @@ namespace Hockey.Client.Main.Model;
 internal class EventModel : ReactiveObject, IEventModel
 {
     [Reactive] public ObservableCollection<EventInfo> Events { get; set; }
-    [Reactive] public ObservableCollection<EventFactory> EventFactories { get; set; }
+    [Reactive] public ObservableCollection<IEventFactory> EventFactories { get; set; }
     [Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
     public IGameStore Store { get; }
+    public IEventAggregator EventAggregator { get; }
 
-    public EventModel(IGameStore store)
+    public EventModel(IGameStore store, IEventAggregator eventAggregator)
     {
         Store = store;
-
+        EventAggregator = eventAggregator;
         Store.WhenAnyValue(x => x.Events)
              .Subscribe(x => Events = x)
              .Cache();
@@ -36,7 +39,7 @@ internal class EventModel : ReactiveObject, IEventModel
             .Cache();
     }
 
-    public EventInfo CreateEvent(EventFactory factory)
+    public EventInfo CreateEvent(DefaultEventFactory factory)
     {
         var eventInfo = factory.Create();
         eventInfo.MillisecondsPerFrame = Store.MillisecondsPerFrame;
@@ -45,5 +48,10 @@ internal class EventModel : ReactiveObject, IEventModel
         eventInfo.EndEventFrameNumber = eventInfo.StartEventFrameNumber + (long)(eventInfo.DefaultDuration.TotalMilliseconds / eventInfo.MillisecondsPerFrame);
 
         return eventInfo;
+    }
+
+    public void PlayEvent(EventInfo eventInfo)
+    {
+        EventAggregator.GetEvent<PlayEvent>().Publish(eventInfo);
     }
 }

@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Hockey.Client.Main.Model.Abstraction;
+using System;
 
 namespace Hockey.Client.Main.Model.Data.Events;
-internal class EventFactory
+internal class DefaultEventFactory : IEventFactory
 {
 	public EventType EventType { get; }
 	private readonly Func<EventType, EventInfo> factory;
 
-	public EventFactory(EventType eventType, Func<EventType, EventInfo> factory)
+	public DefaultEventFactory(EventType eventType, Func<EventType, EventInfo> factory)
 	{
 		EventType = eventType;
 		this.factory = factory;

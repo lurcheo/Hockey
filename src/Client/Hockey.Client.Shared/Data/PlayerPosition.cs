@@ -5,5 +5,5 @@ public enum PlayerPosition
     AttackPlayer,
     DefensePlayer,
     Goalkeeper,
-    None
+    Reserve
 }

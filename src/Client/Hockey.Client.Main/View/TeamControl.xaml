@@ -3,15 +3,155 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dd="urn:gong-wpf-dragdrop"
+    xmlns:dt="clr-namespace:Hockey.Client.Main.Model.Data"
     xmlns:local="clr-namespace:Hockey.Client.Main.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:vm="clr-namespace:Hockey.Client.Main.ViewModel"
+    Name="Root"
     d:DataContext="{d:DesignInstance vm:TeamViewModel}"
     d:Height="450"
     d:Width="800"
     Style="{StaticResource MaterialDesignUserControl}"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="parametersBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDarkSeparatorBackground}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Margin" Value="5,7" />
+        </Style>
+        <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
-        <TextBlock Text="{Binding Model.Name}" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBox
+            Grid.Row="0"
+            Margin="10"
+            Padding="10"
+            md:HintAssist.Hint="Название команды"
+            FontSize="17"
+            Text="{Binding Model.Team.Name, UpdateSourceTrigger=PropertyChanged}" />
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Players}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="1" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource parametersBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource MaterialDesignBody1TextBlock}" TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Position}" Value="AttackPlayer">
+                                                <Setter Property="Text" Value="Атаккующие игроки" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Position}" Value="DefensePlayer">
+                                                <Setter Property="Text" Value="Защищающие игроки" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Position}" Value="Goalkeeper">
+                                                <Setter Property="Text" Value="Вратари" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Position}" Value="Reserve">
+                                                <Setter Property="Text" Value="Резервные игроки" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Width="20"
+                                Height="20"
+                                VerticalAlignment="Center"
+                                Command="{Binding DataContext.CreatePlayerCommand, ElementName=Root}"
+                                CommandParameter="{Binding Position}"
+                                Content="{md:PackIcon Kind=PlusCircle,
+                                                      Size=18}"
+                                Style="{StaticResource IconButton}" />
+                            <ListBox
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch"
+                                dd:DragDrop.IsDragSource="True"
+                                dd:DragDrop.IsDropTarget="True"
+                                dd:DragDrop.ShowAlwaysDropTargetAdorner="True"
+                                dd:DragDrop.UseDefaultDragAdorner="True"
+                                ItemsSource="{Binding Players}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Rows="1" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border d:DataContext="{d:DesignInstance Type=dt:PlayerInfo}" Style="{StaticResource parametersBorder}">
+                                            <Grid VerticalAlignment="Center">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="auto" />
+                                                    <RowDefinition Height="auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox
+                                                    Grid.Row="0"
+                                                    Grid.Column="0"
+                                                    md:HintAssist.Hint="Имя"
+                                                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                                <TextBox
+                                                    Grid.Row="1"
+                                                    Grid.Column="0"
+                                                    md:HintAssist.Hint="Номер"
+                                                    Text="{Binding Number}" />
+                                                <Button
+                                                    Grid.Row="0"
+                                                    Grid.Column="1"
+                                                    Width="20"
+                                                    Height="20"
+                                                    VerticalAlignment="Center"
+                                                    Command="{Binding DataContext.RemovePlayerCommand, ElementName=Root}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="{md:PackIcon Kind=Trash,
+                                                                          Size=18}"
+                                                    Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                                    Style="{StaticResource IconButton}" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </UserControl>

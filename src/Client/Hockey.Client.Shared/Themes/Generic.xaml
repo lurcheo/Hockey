@@ -24,4 +24,14 @@
         <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="SelectionMode" Value="Single" />
     </Style>
+    <Style
+        x:Key="IconButton"
+        BasedOn="{StaticResource MaterialDesignIconButton}"
+        TargetType="{x:Type Button}">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="14" />
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
 </ResourceDictionary>

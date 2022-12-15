@@ -1,4 +1,6 @@
-﻿using OpenCvSharp;
+﻿using Hockey.Client.Main.Model.Data;
+using Hockey.Client.Main.Model.Data.Events;
+using OpenCvSharp;
 using ReactiveUI;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +15,12 @@ internal interface IMainModel : IReactiveObject
     long FramesCount { get; set; }
 
     bool IsUserClick { get; set; }
+    long EndFrameNumber { get; set; }
+    PlayingState PlayingState { get; set; }
+    int MillisecondsPerFrame { get; set; }
+    bool IsPlayEvent { get; set; }
 
     Task ReadVideoFromFile(string fileName, CancellationToken cancellationToken);
     void SetPosition(long position);
+    void PlayEvent(EventInfo eventInfo);
 }

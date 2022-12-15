@@ -8,6 +8,7 @@ internal static class Regions
     public const string HomeTeam = Key + nameof(HomeTeam);
 
     public const string EventsCreating = Key + nameof(EventsCreating);
+    public const string EventConstructor = Key + nameof(EventConstructor);
 
     public const string Events = Key + nameof(Events);
 }
