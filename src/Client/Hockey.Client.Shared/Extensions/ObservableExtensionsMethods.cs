@@ -1,5 +1,4 @@
 ﻿using Prism.Events;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,20 +40,26 @@ public static class ObservableExtensionsMethods
             act => (sender, e) => act(e),
             act => collection.CollectionChanged += act,
             act => collection.CollectionChanged -= act
-        )
+        ).Where(x => x.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Remove)
         .Select(x => x.Action switch
         {
             NotifyCollectionChangedAction.Add => (x.Action, items: x.NewItems),
-            NotifyCollectionChangedAction.Remove => (x.Action, items: x.OldItems),
-            _ => default
-        }).WhereNotNull()
+            NotifyCollectionChangedAction.Remove => (x.Action, items: x.OldItems)
+        })
         .SelectMany(x => x.items.Cast<T>().Select(y => (x.Action, y)));
     }
 
-    public static IObservable<T> ToObservable<T>(this ObservableCollection<T> collection, NotifyCollectionChangedAction action)
+    public static IObservable<T> ToAddObservable<T>(this ObservableCollection<T> collection)
     {
         return collection.ToObservable()
-                         .Where(x => x.action == action)
+                         .Where(x => x.action == NotifyCollectionChangedAction.Add)
+                         .Select(x => x.el);
+    }
+
+    public static IObservable<T> ToRemoveObservable<T>(this ObservableCollection<T> collection)
+    {
+        return collection.ToObservable()
+                         .Where(x => x.action == NotifyCollectionChangedAction.Remove)
                          .Select(x => x.el);
     }
 }

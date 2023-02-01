@@ -45,8 +45,8 @@
         </ToolBarTray>
         <DockPanel Grid.Row="1">
             <md:DrawerHost
-                IsLeftDrawerOpen="{Binding IsChecked, ElementName=showLeftMenu}"
-                IsRightDrawerOpen="{Binding IsChecked, ElementName=showRightMenu}"
+                IsLeftDrawerOpen="{Binding IsLeftMenuOpen}"
+                IsRightDrawerOpen="{Binding IsRightMenuOpen}"
                 OpenMode="Standard">
                 <md:DrawerHost.LeftDrawerContent>
                     <TabControl
@@ -70,15 +70,6 @@
                         <TabItem>
                             <TabItem.Header>
                                 <StackPanel Width="auto" Height="auto">
-                                    <md:PackIcon Kind="Event" Style="{StaticResource tabIcon}" />
-                                    <TextBlock Style="{StaticResource tabText}" Text="Создать событие" />
-                                </StackPanel>
-                            </TabItem.Header>
-                            <ContentControl prism:RegionManager.RegionName="{x:Static local:Regions.EventsCreating}" />
-                        </TabItem>
-                        <TabItem>
-                            <TabItem.Header>
-                                <StackPanel Width="auto" Height="auto">
                                     <md:PackIcon Kind="Home" Style="{StaticResource tabIcon}" />
                                     <TextBlock Style="{StaticResource tabText}" Text="Команда хозяев" />
                                 </StackPanel>
@@ -93,6 +84,15 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ContentControl prism:RegionManager.RegionName="{x:Static local:Regions.GuestTeam}" />
+                        </TabItem>
+                        <TabItem>
+                            <TabItem.Header>
+                                <StackPanel Width="auto" Height="auto">
+                                    <md:PackIcon Kind="Event" Style="{StaticResource tabIcon}" />
+                                    <TextBlock Style="{StaticResource tabText}" Text="Создать событие" />
+                                </StackPanel>
+                            </TabItem.Header>
+                            <ContentControl prism:RegionManager.RegionName="{x:Static local:Regions.EventsCreating}" />
                         </TabItem>
                         <TabItem>
                             <TabItem.Header>
@@ -119,22 +119,20 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <ToggleButton
-                        Name="showLeftMenu"
                         Margin="15"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         AutomationProperties.Name="HamburgerToggleButton"
-                        IsChecked="False"
+                        IsChecked="{Binding IsLeftMenuOpen}"
                         Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                     <ToggleButton
-                        Name="showRightMenu"
                         Grid.Row="0"
                         Grid.Column="2"
                         Margin="15"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         AutomationProperties.Name="HamburgerToggleButton"
-                        IsChecked="False"
+                        IsChecked="{Binding IsRightMenuOpen}"
                         RenderTransformOrigin="0.5,0.5"
                         Style="{StaticResource MaterialDesignHamburgerToggleButton}">
                         <ToggleButton.RenderTransform>
@@ -148,7 +146,6 @@
                         Margin="65,0,65,0"
                         VerticalAlignment="Bottom"
                         Source="{Binding Frame}" />
-
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="1"

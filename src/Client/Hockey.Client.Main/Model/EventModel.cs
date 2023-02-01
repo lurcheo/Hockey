@@ -17,16 +17,28 @@ internal class EventModel : ReactiveObject, IEventModel
     [Reactive] public ObservableCollection<EventInfo> Events { get; set; }
     [Reactive] public ObservableCollection<IEventFactory> EventFactories { get; set; }
     [Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
+
     public IGameStore Store { get; }
     public IEventAggregator EventAggregator { get; }
+
+    private IDisposable eventAddedDisposable;
 
     public EventModel(IGameStore store, IEventAggregator eventAggregator)
     {
         Store = store;
         EventAggregator = eventAggregator;
+
         Store.WhenAnyValue(x => x.Events)
              .Subscribe(x => Events = x)
              .Cache();
+
+        this.WhenAnyValue(x => x.Events)
+            .Subscribe(x =>
+            {
+                eventAddedDisposable?.Dispose();
+                eventAddedDisposable = x?.ToAddObservable()
+                                        ?.Subscribe(EventAggregator.GetEvent<EventAdded>().Publish);
+            }).Cache();
 
         Store.WhenAnyValue(x => x.EventFactories)
              .Subscribe(x => EventFactories = x)
