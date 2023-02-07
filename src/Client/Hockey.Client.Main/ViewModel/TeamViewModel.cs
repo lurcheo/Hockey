@@ -24,33 +24,56 @@ internal class TeamViewModel : ReactiveObject
     public PositionPlayers ReservePlayers { get; } = new(PlayerPosition.Reserve);
 
     public IEnumerable<PositionPlayers> Players { get; }
-    [Reactive] public int LinksCount { get; set; } = 4;
 
+    [Reactive] public int LinksCount { get; set; }
     [Reactive] public IEnumerable<LinkViewModel> Links { get; set; }
+    [Reactive] public LinkViewModel SelectedLink { get; set; }
 
     public ICommand AddLinkCommand { get; }
     public ICommand RemoveLinkCommand { get; }
 
-    public ICommand SelectLinkCommand { get; }
-
     public ICommand CreatePlayerCommand { get; }
+    public ICommand MovePlayerCommand { get; }
     public ICommand RemovePlayerCommand { get; }
 
     public TeamViewModel(ITeamModel model)
     {
         Model = model;
 
-        CreatePlayerCommand = ReactiveCommand.Create<PlayerPosition>(CreatePlayer);
-        RemovePlayerCommand = ReactiveCommand.Create<PlayerInfo>(RemovePlayer);
-        SelectLinkCommand = ReactiveCommand.Create<LinkViewModel>(x =>
+        MovePlayerCommand = ReactiveCommand.Create<PlayerMoveCommandParameter>(x =>
         {
-            //TODO поменять игроков на игроков другово звена
+            x.PlayerInfo.Link = x.NewLink;
 
-            int link = x.Number;
+            (x.PlayerInfo.Position switch
+            {
+                PlayerPosition.AttackPlayer => AttackPlayers,
+                PlayerPosition.DefensePlayer => DefendPlayers,
+                PlayerPosition.Goalkeeper => Goalkepers,
+                PlayerPosition.Reserve => ReservePlayers
+            }).Players.Remove(x.PlayerInfo);
         });
 
-        AddLinkCommand = ReactiveCommand.Create(() => LinksCount++);
-        RemoveLinkCommand = ReactiveCommand.Create(() => LinksCount--);
+        CreatePlayerCommand = ReactiveCommand.Create<PlayerPosition>
+        (
+            x => CreatePlayer(SelectedLink.Number, x),
+            this.WhenAnyValue(x => x.SelectedLink).Select(x => x is not null)
+        );
+
+        RemovePlayerCommand = ReactiveCommand.Create<PlayerInfo>(RemovePlayer);
+
+        AddLinkCommand = ReactiveCommand.Create
+        (
+            () => LinksCount++,
+            this.WhenAnyValue(x => x.LinksCount)
+                .Select(x => x < 10)
+        );
+
+        RemoveLinkCommand = ReactiveCommand.Create
+        (
+            () => LinksCount--,
+            this.WhenAnyValue(x => x.LinksCount)
+                .Select(x => x > 1)
+        );
 
         Players = new[]
         {
@@ -60,6 +83,12 @@ internal class TeamViewModel : ReactiveObject
             ReservePlayers
         };
 
+        Model.WhenAnyValue(x => x.Team)
+            .Select(x => x.Players)
+            .Select(x => x.Max(x => x.Link))
+            .Subscribe(x => LinksCount = x)
+            .Cache();
+
         this.WhenAnyValue(x => x.LinksCount)
             .Select(x => Enumerable.Range(1, LinksCount))
             .Select(x => x.Select(i => new LinkViewModel { Number = i }))
@@ -67,36 +96,41 @@ internal class TeamViewModel : ReactiveObject
             .Subscribe(x => Links = x)
             .Cache();
 
+        SelectedLink = Links.First();
+
+        var linkChanged = this.WhenAnyValue(x => x.SelectedLink)
+                              .WhereNotNull();
+
+
         var playersChanged = Model.WhenAnyValue(x => x.Team)
                                   .Select(x => x.Players)
                                   .Select(x => x.AsEnumerable());
 
-        Init(playersChanged, AttackPlayers);
-        Init(playersChanged, DefendPlayers);
-        Init(playersChanged, Goalkepers);
-        Init(playersChanged, ReservePlayers);
+        Init(playersChanged, linkChanged, AttackPlayers);
+        Init(playersChanged, linkChanged, DefendPlayers);
+        Init(playersChanged, linkChanged, Goalkepers);
+        Init(playersChanged, linkChanged, ReservePlayers);
     }
 
-    private static void Init(IObservable<IEnumerable<PlayerInfo>> src, PositionPlayers dst)
+    private static void Init(IObservable<IEnumerable<PlayerInfo>> src, IObservable<LinkViewModel> link, PositionPlayers dst)
     {
-        src.Subscribe(players =>
-        {
-            dst.Players.Clear();
-            dst.Players.AddRange(players.Where(x => x.Position == dst.Position));
-        }).Cache();
+        src.CombineLatest(link, (players, link) => players.Where(x => x.Link == link.Number))
+           .Select(x => x.Where(x => x.Position == dst.Position))
+           .Do(_ => dst.Players.Clear())
+           .Subscribe(dst.Players.AddRange)
+           .Cache();
 
         dst.Players
            .ToAddObservable()
            .Where(x => x.Position != dst.Position)
-           .Subscribe(x =>
-           {
-               x.Position = dst.Position;
-           }).Cache();
+           .Subscribe(x => x.Position = dst.Position)
+           .Cache();
     }
 
     private void RemovePlayer(PlayerInfo player)
     {
         Model.Team.Players.Remove(player);
+
         (player.Position switch
         {
             PlayerPosition.AttackPlayer => AttackPlayers,
@@ -106,9 +140,9 @@ internal class TeamViewModel : ReactiveObject
         }).Players.Remove(player);
     }
 
-    private void CreatePlayer(PlayerPosition playerPosition)
+    private void CreatePlayer(int link, PlayerPosition playerPosition)
     {
-        var player = new PlayerInfo("Новый игрок", 0, playerPosition);
+        var player = new PlayerInfo("Новый игрок", 0, playerPosition, link);
 
         Model.Team.Players.Add(player);
         (playerPosition switch

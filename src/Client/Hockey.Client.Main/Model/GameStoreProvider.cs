@@ -69,15 +69,15 @@ internal class GameStoreProvider : IGameStoreProvider
 
     private static TeamInfo GetDefaultHomeTeam()
     {
-        return new("Команда хозяев", Enumerable.Range(1, 10)
-                                               .Select(x => new PlayerInfo($"Игрок хозяев {x}", x, (PlayerPosition)(x % 4)))
+        return new("Команда хозяев", Enumerable.Range(1, 23)
+                                               .Select(x => new PlayerInfo($"Игрок хозяев {x}", x, (PlayerPosition)(x % 4), x / 6 + 1))
                                                .ToArray());
     }
 
     private static TeamInfo GetDefaultGuestTeam()
     {
-        return new("Команда гостей", Enumerable.Range(1, 10)
-                                               .Select(x => new PlayerInfo($"Игрок гостей {x}", x, (PlayerPosition)(x % 4)))
+        return new("Команда гостей", Enumerable.Range(1, 23)
+                                               .Select(x => new PlayerInfo($"Игрок гостей {x}", x, (PlayerPosition)(x % 4), x / 6 + 1))
                                                .ToArray());
     }
 }

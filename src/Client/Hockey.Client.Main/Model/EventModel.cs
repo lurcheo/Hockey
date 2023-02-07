@@ -9,6 +9,7 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 
 namespace Hockey.Client.Main.Model;
 
@@ -33,12 +34,12 @@ internal class EventModel : ReactiveObject, IEventModel
              .Cache();
 
         this.WhenAnyValue(x => x.Events)
-            .Subscribe(x =>
-            {
-                eventAddedDisposable?.Dispose();
-                eventAddedDisposable = x?.ToAddObservable()
-                                        ?.Subscribe(EventAggregator.GetEvent<EventAdded>().Publish);
-            }).Cache();
+            .Do(_ => eventAddedDisposable?.Dispose())
+            .WhereNotNull()
+            .Select(x => x.ToAddObservable())
+            .Select(x => x.Subscribe(EventAggregator.GetEvent<EventAdded>().Publish))
+            .Subscribe(x => eventAddedDisposable = x)
+            .Cache();
 
         Store.WhenAnyValue(x => x.EventFactories)
              .Subscribe(x => EventFactories = x)
