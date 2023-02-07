@@ -70,7 +70,15 @@ internal class TeamViewModel : ReactiveObject
 
         RemoveLinkCommand = ReactiveCommand.Create
         (
-            () => LinksCount--,
+            () =>
+            {
+                foreach (var player in Model.Team.Players.Where(x => x.Link == LinksCount))
+                {
+                    player.Link--;
+                }
+
+                LinksCount--;
+            },
             this.WhenAnyValue(x => x.LinksCount)
                 .Select(x => x > 1)
         );

@@ -148,7 +148,7 @@
                                 <Border Style="{StaticResource parametersBorder}">
                                     <StackPanel>
                                         <ComboBox
-                                            md:HintAssist.Hint="Команда"
+                                            md:HintAssist.Hint="{Binding TeamName}"
                                             DisplayMemberPath="Name"
                                             ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
                                             SelectedValue="{Binding Team}" />

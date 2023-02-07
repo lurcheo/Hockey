@@ -52,7 +52,7 @@ internal class EventModel : ReactiveObject, IEventModel
             .Cache();
     }
 
-    public EventInfo CreateEvent(DefaultEventFactory factory)
+    public EventInfo CreateEvent(IEventFactory factory)
     {
         var eventInfo = factory.Create();
         eventInfo.MillisecondsPerFrame = Store.MillisecondsPerFrame;

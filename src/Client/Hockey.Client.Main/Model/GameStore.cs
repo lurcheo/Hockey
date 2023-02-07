@@ -12,6 +12,7 @@ internal class GameStore : ReactiveObject, IGameStore
 {
     [Reactive] public ObservableCollection<EventInfo> Events { get; set; }
     [Reactive] public ObservableCollection<IEventFactory> EventFactories { get; set; }
+
     [Reactive] public TeamInfo HomeTeam { get; set; }
     [Reactive] public TeamInfo GuestTeam { get; set; }
     [Reactive] public long FrameNumber { get; set; }

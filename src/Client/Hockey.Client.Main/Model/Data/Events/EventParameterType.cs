@@ -3,5 +3,6 @@
 internal enum EventParameterType
 {
     Player,
-    Team
+    Team,
+    Text
 }

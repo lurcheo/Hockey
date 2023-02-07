@@ -6,4 +6,5 @@ namespace Hockey.Client.Main.Model.Abstraction;
 internal interface IEventFactory : IFactory<EventInfo>
 {
     EventType EventType { get; }
+    bool IsCustom { get; }
 }
