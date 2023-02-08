@@ -21,11 +21,21 @@ internal class CustomEventFactory : IEventFactory
         return new EventInfo(EventType,
                              FactoryCreator.DefaultTimeSpan,
                              FactoryCreator.ParameterFactories
-                                           .Select(x => x.ParameterType switch
+                                           .Select(x => x switch
                                            {
-                                               EventParameterType.Player => new PlayerEventParameter(name: x.Name) as EventParameter,
-                                               EventParameterType.Team => new TeamEventParameter(x.Name),
-                                               EventParameterType.Text => new TextEventParameter(x.Name),
+                                               CustomPlayerEventParameterFactory f => new PlayerEventParameter(f.TeamName, f.Name)
+                                               {
+                                                   Player = f.DefaultPlayer,
+                                                   Team = f.DefaultTeam,
+                                               } as EventParameter,
+                                               CustomTeamEventParameterFactory f => new TeamEventParameter(f.Name)
+                                               {
+                                                   Team = f.DefaultTeam,
+                                               },
+                                               CustomTextEventParameterFactory f => new TextEventParameter(f.Name)
+                                               {
+                                                   Text = f.DefaultText
+                                               },
                                            }).ToArray());
     }
 }

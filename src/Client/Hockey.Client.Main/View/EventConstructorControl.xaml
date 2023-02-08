@@ -1,0 +1,175 @@
+﻿<UserControl
+    x:Class="Hockey.Client.Main.View.EventConstructorControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cv="clr-namespace:Hockey.Client.Shared.Converter;assembly=Hockey.Client.Shared"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ev="clr-namespace:Hockey.Client.Main.Model.Data.Events"
+    xmlns:local="clr-namespace:Hockey.Client.Main.View"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:vm="clr-namespace:Hockey.Client.Main.ViewModel"
+    Name="Root"
+    d:DataContext="{d:DesignInstance vm:EventConstructorViewModel}"
+    d:Height="450"
+    d:Width="800"
+    Style="{StaticResource MaterialDesignUserControl}"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="parametersBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDarkSeparatorBackground}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Margin" Value="5,7" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="7*" />
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" Style="{StaticResource MaterialDesignCardGroupBox}">
+            <GroupBox.Header>
+                <UniformGrid Rows=" 1">
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource MaterialDesignPaper}"
+                        Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                        Text="Кастомные события" />
+                    <Button
+                        HorizontalAlignment="Right"
+                        Command="{Binding AddCustomEventFactoryCommand}"
+                        Content="{md:PackIcon Kind=PlusBox}" />
+                </UniformGrid>
+            </GroupBox.Header>
+            <DataGrid ItemsSource="{Binding Model.FactoryCreators}" SelectedItem="{Binding SelectedFactoryCreator}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Name}" Header="Наименование" />
+                    <DataGridTextColumn Binding="{Binding DefaultTimeSpan}" Header="Длительность по умолчанию" />
+                    <DataGridTextColumn Binding="{Binding IsCreated, Converter={cv:BooleanTextConverter}, ConverterParameter='Не доступен___Доступен'}" Header="Доступен к редактированию" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <GroupBox Grid.Row="1" IsEnabled="{Binding SelectedFactoryCreator.IsCreated, Converter={cv:ReverseBoolConverter}}">
+            <GroupBox.Header>
+                <UniformGrid Rows=" 1">
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource MaterialDesignPaper}"
+                        Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                        Text="Редактирование кастомного события" />
+                    <Button
+                        HorizontalAlignment="Right"
+                        Command="{Binding CreateSelectedFactoryCommand}"
+                        Content="{md:PackIcon Kind=Create}" />
+                </UniformGrid>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBox
+                    Grid.Row="0"
+                    md:HintAssist.Hint="Наименование"
+                    Text="{Binding SelectedFactoryCreator.Name, Mode=TwoWay}" />
+                <TextBox
+                    Grid.Row="1"
+                    md:HintAssist.Hint="Длительность по умолчанию"
+                    IsReadOnly="True"
+                    Text="{Binding SelectedFactoryCreator.DefaultTimeSpan}" />
+                <GroupBox Grid.Row="2">
+                    <GroupBox.Header>
+                        <UniformGrid Rows=" 1">
+                            <TextBlock
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource MaterialDesignPaper}"
+                                Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                Text="Параметры кастомного события" />
+                            <Menu HorizontalAlignment="Right">
+                                <MenuItem Header="{md:PackIcon Kind=PlusBox}">
+                                    <MenuItem Command="{Binding AddPlayerParameterCommand}" Header="Игрок" />
+                                    <MenuItem Command="{Binding AddTeamParameterCommand}" Header="Команда" />
+                                    <MenuItem Command="{Binding AddTextParameterCommand}" Header="Текст" />
+                                </MenuItem>
+                            </Menu>
+                        </UniformGrid>
+                    </GroupBox.Header>
+                    <ItemsControl ItemsSource="{Binding SelectedFactoryCreator.ParameterFactories}">
+                        <ItemsControl.Resources>
+                            <DataTemplate DataType="{x:Type ev:CustomPlayerEventParameterFactory}">
+                                <Border Style="{StaticResource parametersBorder}">
+                                    <UniformGrid Rows="2">
+                                        <TextBox
+                                            Margin="10"
+                                            Padding="5"
+                                            md:HintAssist.Hint="Наименование параметра игрока"
+                                            Text="{Binding Name}" />
+                                        <TextBox
+                                            Margin="10"
+                                            Padding="5"
+                                            md:HintAssist.Hint="Наименование параметра команды"
+                                            Text="{Binding TeamName}" />
+                                        <ComboBox
+                                            Margin="10"
+                                            Padding="5"
+                                            md:HintAssist.Hint="Команда по умолчанию"
+                                            DisplayMemberPath="Name"
+                                            ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
+                                            SelectedItem="{Binding DefaultTeam}" />
+                                        <ComboBox
+                                            Margin="10"
+                                            Padding="5"
+                                            md:HintAssist.Hint="Игрок по умолчанию"
+                                            DisplayMemberPath="Name"
+                                            ItemsSource="{Binding DefaultTeam.Players}"
+                                            SelectedItem="{Binding DefaultPlayer}" />
+                                    </UniformGrid>
+                                </Border>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type ev:CustomTeamEventParameterFactory}">
+                                <Border Style="{StaticResource parametersBorder}">
+                                    <UniformGrid Rows="1">
+                                        <TextBox
+                                            Margin="10"
+                                            Padding="5"
+                                            md:HintAssist.Hint="Наименование параметра команды"
+                                            Text="{Binding Name}" />
+                                        <ComboBox
+                                            Margin="10"
+                                            Padding="5"
+                                            md:HintAssist.Hint="Команда по умолчанию"
+                                            DisplayMemberPath="Name"
+                                            ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
+                                            SelectedItem="{Binding DefaultTeam}" />
+                                    </UniformGrid>
+                                </Border>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type ev:CustomTextEventParameterFactory}">
+                                <Border Style="{StaticResource parametersBorder}">
+                                    <UniformGrid Rows="1">
+                                        <TextBox
+                                            Margin="10"
+                                            Padding="5"
+                                            md:HintAssist.Hint="Наименование параметра команды"
+                                            Text="{Binding Name}" />
+                                        <TextBox
+                                            Margin="10"
+                                            Padding="5"
+                                            md:HintAssist.Hint="Значение текста по умолчанию"
+                                            Text="{Binding DefaultText}" />
+                                    </UniformGrid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.Resources>
+                    </ItemsControl>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

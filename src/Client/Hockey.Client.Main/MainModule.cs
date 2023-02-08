@@ -21,7 +21,8 @@ public class MainModule : IModule
         regionManager.RegisterViewWithRegion<GuestTeamControl>(Regions.GuestTeam)
                      .RegisterViewWithRegion<HomeTeamControl>(Regions.HomeTeam)
                      .RegisterViewWithRegion<EventsCreatingControl>(Regions.EventsCreating)
-                     .RegisterViewWithRegion<EventsControl>(Regions.Events);
+                     .RegisterViewWithRegion<EventsControl>(Regions.Events)
+                     .RegisterViewWithRegion<EventConstructorControl>(Regions.EventConstructor);
     }
 
     public void RegisterTypes(IContainerRegistry containerRegistry)
@@ -34,12 +35,14 @@ public class MainModule : IModule
 
         containerRegistry.RegisterSingleton<IHomeTeamModel, HomeTeamModel>()
                          .RegisterSingleton<IGuestTeamModel, GuestTeamModel>()
-                         .RegisterSingleton<IEventModel, EventModel>();
+                         .RegisterSingleton<IEventModel, EventModel>()
+                         .RegisterSingleton<IEventConstructorModel, EventConstructorModel>();
 
         ViewModelLocationProvider.Register<MainControl, MainViewModel>();
         ViewModelLocationProvider.Register<GuestTeamControl, GuestTeamViewModel>();
         ViewModelLocationProvider.Register<HomeTeamControl, HomeTeamViewModel>();
         ViewModelLocationProvider.Register<EventsCreatingControl, EventsViewModel>();
         ViewModelLocationProvider.Register<EventsControl, EventsViewModel>();
+        ViewModelLocationProvider.Register<EventConstructorControl, EventConstructorViewModel>();
     }
 }

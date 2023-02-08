@@ -14,43 +14,13 @@ internal class GameStoreProvider : IGameStoreProvider
     {
         return new GameStore(Enumerable.Empty<EventInfo>(),
                              GetDefaultEventFactories(),
+                             Enumerable.Empty<CustomEventFactoryCreator>(),
                              GetDefaultHomeTeam(),
                              GetDefaultGuestTeam());
     }
 
     private static IEnumerable<IEventFactory> GetDefaultEventFactories()
     {
-
-        var custom = new CustomEventFactoryCreator
-        {
-            DefaultTimeSpan = TimeSpan.FromSeconds(10),
-            Name = "Кастомный",
-        };
-        custom.ParameterFactories.Add(new CustomEventParameterFactory
-        {
-            Name = "Чел1",
-            ParameterType = EventParameterType.Player
-        });
-        custom.ParameterFactories.Add(new CustomEventParameterFactory
-        {
-            Name = "Чел2",
-            ParameterType = EventParameterType.Player
-        });
-        custom.ParameterFactories.Add(new CustomEventParameterFactory
-        {
-            Name = "Чел3",
-            ParameterType = EventParameterType.Player
-        });
-        custom.ParameterFactories.Add(new CustomEventParameterFactory
-        {
-            Name = "Кто я?",
-            ParameterType = EventParameterType.Team
-        });
-        custom.ParameterFactories.Add(new CustomEventParameterFactory
-        {
-            Name = "Как обосрался",
-            ParameterType = EventParameterType.Text
-        });
 
         return new IEventFactory[]
         {
@@ -96,8 +66,6 @@ internal class GameStoreProvider : IGameStoreProvider
                                                                          TimeSpan.FromSeconds(10),
                                                                          new TextEventParameter("Описание"),
                                                                          new PlayerEventParameter())),
-
-            new CustomEventFactory(custom),
         };
     }
 
