@@ -2,7 +2,7 @@
 
 namespace Hockey.Client.Main.Model.Data.Events;
 
-internal class CustomTeamEventParameterFactory : CustomEventParameterFactory
+internal class TeamEventParameterFactory : EventParameterFactory
 {
     [Reactive] public TeamInfo DefaultTeam { get; set; }
 }

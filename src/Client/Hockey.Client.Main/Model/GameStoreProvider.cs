@@ -1,4 +1,5 @@
-﻿using Hockey.Client.Main.Model.Abstraction;
+﻿using Hockey.Client.Main.Dto;
+using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
 using Hockey.Client.Shared.Data;
@@ -12,60 +13,102 @@ internal class GameStoreProvider : IGameStoreProvider
 {
     public IGameStore CreateDefault()
     {
-        return new GameStore(Enumerable.Empty<EventInfo>(),
-                             GetDefaultEventFactories(),
-                             Enumerable.Empty<CustomEventFactoryCreator>(),
+        var factories = GetDefaultEventFactoryCreators();
+
+        var store = new GameStore(Enumerable.Empty<EventInfo>(),
+                             factories.Select(x => x.CreateFactory()),
+                             factories,
                              GetDefaultHomeTeam(),
                              GetDefaultGuestTeam());
+
+        store.Save();
+
+        return store;
     }
 
-    private static IEnumerable<IEventFactory> GetDefaultEventFactories()
+    private static IEnumerable<EventFactoryCreator> GetDefaultEventFactoryCreators()
     {
-
-        return new IEventFactory[]
+        return new EventFactoryCreator[]
         {
-            new DefaultEventFactory(new EventType("Гол"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new PlayerEventParameter("Забивший"),
-                                                                         new PlayerEventParameter("Ассистент"))),
-            new DefaultEventFactory(new EventType("Толчок"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new PlayerEventParameter("Провинившийся"),
-                                                                         new PlayerEventParameter("Жертва"))),
-            new DefaultEventFactory(new EventType("Игра в меньшистве"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new TeamEventParameter())),
-            new DefaultEventFactory(new EventType("Игра в большинстве"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new TeamEventParameter())),
-            new DefaultEventFactory(new EventType("Гол1"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new PlayerEventParameter())),
-            new DefaultEventFactory(new EventType("Гол2"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new PlayerEventParameter())),
-            new DefaultEventFactory(new EventType("Гол3"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new PlayerEventParameter())),
-            new DefaultEventFactory(new EventType("Гол4"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new PlayerEventParameter())),
-            new DefaultEventFactory(new EventType("Гол5"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new PlayerEventParameter())),
-            new DefaultEventFactory(new EventType("Гол6"), type => new EventInfo(type,
-                                                                         TimeSpan.FromSeconds(10),
-                                                                         new TextEventParameter("Описание"),
-                                                                         new PlayerEventParameter())),
+            new EventFactoryCreator
+            (
+                new EventParameterFactory[]
+                {
+                    new TextEventParameterFactory
+                    {
+                        Name = "Описание"
+                    },
+                    new PlayerEventParameterFactory
+                    {
+                        Name = "Игрок",
+                        TeamName= "Команда",
+                    }
+                }
+            )
+            {
+                Name = "Гол",
+                DefaultTimeSpan = TimeSpan.FromSeconds(10),
+            },
+            new EventFactoryCreator
+            (
+                new EventParameterFactory[]
+                {
+                    new TextEventParameterFactory
+                    {
+                        Name = "Описание"
+                    },
+                    new PlayerEventParameterFactory
+                    {
+                        Name = "Провинившийся",
+                        TeamName= "Команда провинившегося",
+                    },
+                    new PlayerEventParameterFactory
+                    {
+                        Name = "Жертва",
+                        TeamName= "Команда жертвы",
+                    },
+                }
+            )
+            {
+                Name = "Толчок",
+                DefaultTimeSpan = TimeSpan.FromSeconds(10),
+            },
+            new EventFactoryCreator
+            (
+                new EventParameterFactory[]
+                {
+                    new TextEventParameterFactory
+                    {
+                        Name = "Описание"
+                    },
+                    new TeamEventParameterFactory
+                    {
+                        Name = "Команда",
+                    },
+                }
+            )
+            {
+                Name = "Игра в меньшинстве",
+                DefaultTimeSpan = TimeSpan.FromSeconds(10),
+            },
+            new EventFactoryCreator
+            (
+                new EventParameterFactory[]
+                {
+                    new TextEventParameterFactory
+                    {
+                        Name = "Описание"
+                    },
+                    new TeamEventParameterFactory
+                    {
+                        Name = "Команда",
+                    },
+                }
+            )
+            {
+                Name = "Игра в большинстве",
+                DefaultTimeSpan = TimeSpan.FromSeconds(10),
+            }
         };
     }
 

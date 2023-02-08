@@ -23,6 +23,10 @@
             <Setter Property="Padding" Value="5" />
             <Setter Property="Margin" Value="5,7" />
         </Style>
+        <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
+            <Setter Property="Margin" Value="5" />
+        </Style>
+        <Style BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}" TargetType="ComboBox" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -37,10 +41,10 @@
                         VerticalAlignment="Center"
                         Foreground="{DynamicResource MaterialDesignPaper}"
                         Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
-                        Text="Кастомные события" />
+                        Text="Созданные события" />
                     <Button
                         HorizontalAlignment="Right"
-                        Command="{Binding AddCustomEventFactoryCommand}"
+                        Command="{Binding AddEventFactoryCommand}"
                         Content="{md:PackIcon Kind=PlusBox}" />
                 </UniformGrid>
             </GroupBox.Header>
@@ -102,7 +106,7 @@
                     </GroupBox.Header>
                     <ItemsControl ItemsSource="{Binding SelectedFactoryCreator.ParameterFactories}">
                         <ItemsControl.Resources>
-                            <DataTemplate DataType="{x:Type ev:CustomPlayerEventParameterFactory}">
+                            <DataTemplate DataType="{x:Type ev:PlayerEventParameterFactory}">
                                 <Border Style="{StaticResource parametersBorder}">
                                     <UniformGrid Rows="2">
                                         <TextBox
@@ -132,7 +136,7 @@
                                     </UniformGrid>
                                 </Border>
                             </DataTemplate>
-                            <DataTemplate DataType="{x:Type ev:CustomTeamEventParameterFactory}">
+                            <DataTemplate DataType="{x:Type ev:TeamEventParameterFactory}">
                                 <Border Style="{StaticResource parametersBorder}">
                                     <UniformGrid Rows="1">
                                         <TextBox
@@ -150,7 +154,7 @@
                                     </UniformGrid>
                                 </Border>
                             </DataTemplate>
-                            <DataTemplate DataType="{x:Type ev:CustomTextEventParameterFactory}">
+                            <DataTemplate DataType="{x:Type ev:TextEventParameterFactory}">
                                 <Border Style="{StaticResource parametersBorder}">
                                     <UniformGrid Rows="1">
                                         <TextBox

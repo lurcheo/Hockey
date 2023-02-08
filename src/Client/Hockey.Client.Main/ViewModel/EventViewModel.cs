@@ -25,7 +25,7 @@ internal class EventsViewModel : ReactiveObject
         Model = model;
         EventAggregator = eventAggregator;
 
-        AddEventCommand = ReactiveCommand.Create<IEventFactory>(x => Model.Events.Add(Model.CreateEvent(x)));
+        AddEventCommand = ReactiveCommand.Create<EventFactory>(x => Model.Events.Add(Model.CreateEvent(x)));
         RemoveEventCommand = ReactiveCommand.Create<EventInfo>(x => Model.Events.Remove(x));
 
         PlayEventCommand = ReactiveCommand.Create<EventInfo>(Model.PlayEvent);

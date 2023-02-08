@@ -2,7 +2,7 @@
 
 namespace Hockey.Client.Main.Model.Data.Events;
 
-internal class CustomTextEventParameterFactory : CustomEventParameterFactory
+internal class TextEventParameterFactory : EventParameterFactory
 {
     [Reactive] public string DefaultText { get; set; }
 }

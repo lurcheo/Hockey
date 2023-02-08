@@ -19,6 +19,7 @@
         <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
             <Setter Property="Margin" Value="5" />
         </Style>
+        <Style BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}" TargetType="ComboBox" />
         <Style x:Key="parametersBorder" TargetType="Border">
             <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDarkSeparatorBackground}" />
             <Setter Property="BorderThickness" Value="2" />
@@ -143,7 +144,6 @@
                     </Border>
                     <ItemsControl ItemsSource="{Binding SelectedEvent.Parameters}">
                         <ItemsControl.Resources>
-                            <Style BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}" TargetType="ComboBox" />
                             <DataTemplate DataType="{x:Type ev:PlayerEventParameter}">
                                 <Border Style="{StaticResource parametersBorder}">
                                     <StackPanel>

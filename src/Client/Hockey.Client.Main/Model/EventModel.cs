@@ -16,7 +16,7 @@ namespace Hockey.Client.Main.Model;
 internal class EventModel : ReactiveObject, IEventModel
 {
     [Reactive] public ObservableCollection<EventInfo> Events { get; set; }
-    [Reactive] public ObservableCollection<IEventFactory> EventFactories { get; set; }
+    [Reactive] public ObservableCollection<EventFactory> EventFactories { get; set; }
     [Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
 
     public IGameStore Store { get; }
@@ -52,7 +52,7 @@ internal class EventModel : ReactiveObject, IEventModel
             .Cache();
     }
 
-    public EventInfo CreateEvent(IEventFactory factory)
+    public EventInfo CreateEvent(EventFactory factory)
     {
         var eventInfo = factory.Create();
         eventInfo.MillisecondsPerFrame = Store.MillisecondsPerFrame;

@@ -1,16 +1,13 @@
-﻿using Hockey.Client.Main.Model.Abstraction;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Hockey.Client.Main.Model.Data.Events;
 
-internal class CustomEventFactory : IEventFactory
+internal class EventFactory
 {
     public EventType EventType { get; }
-    public bool IsCustom => false;
+    public EventFactoryCreator FactoryCreator { get; }
 
-    public CustomEventFactoryCreator FactoryCreator { get; }
-
-    public CustomEventFactory(CustomEventFactoryCreator factoryCreator)
+    public EventFactory(EventFactoryCreator factoryCreator)
     {
         FactoryCreator = factoryCreator;
         EventType = new(factoryCreator.Name);
@@ -23,16 +20,16 @@ internal class CustomEventFactory : IEventFactory
                              FactoryCreator.ParameterFactories
                                            .Select(x => x switch
                                            {
-                                               CustomPlayerEventParameterFactory f => new PlayerEventParameter(f.TeamName, f.Name)
+                                               PlayerEventParameterFactory f => new PlayerEventParameter(f.TeamName, f.Name)
                                                {
                                                    Player = f.DefaultPlayer,
                                                    Team = f.DefaultTeam,
                                                } as EventParameter,
-                                               CustomTeamEventParameterFactory f => new TeamEventParameter(f.Name)
+                                               TeamEventParameterFactory f => new TeamEventParameter(f.Name)
                                                {
                                                    Team = f.DefaultTeam,
                                                },
-                                               CustomTextEventParameterFactory f => new TextEventParameter(f.Name)
+                                               TextEventParameterFactory f => new TextEventParameter(f.Name)
                                                {
                                                    Text = f.DefaultText
                                                },

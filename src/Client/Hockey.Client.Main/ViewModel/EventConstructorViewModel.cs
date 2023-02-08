@@ -12,10 +12,10 @@ namespace Hockey.Client.Main.ViewModel;
 internal class EventConstructorViewModel : ReactiveObject
 {
     public IEventConstructorModel Model { get; }
-    [Reactive] public CustomEventFactoryCreator SelectedFactoryCreator { get; set; }
+    [Reactive] public EventFactoryCreator SelectedFactoryCreator { get; set; }
 
 
-    public ICommand AddCustomEventFactoryCommand { get; }
+    public ICommand AddEventFactoryCommand { get; }
     public ICommand AddPlayerParameterCommand { get; }
     public ICommand AddTeamParameterCommand { get; }
     public ICommand AddTextParameterCommand { get; }
@@ -37,11 +37,11 @@ internal class EventConstructorViewModel : ReactiveObject
                                      (s, c) => s && !c)
         );
 
-        AddCustomEventFactoryCommand = ReactiveCommand.Create
+        AddEventFactoryCommand = ReactiveCommand.Create
         (
             () =>
             {
-                CustomEventFactoryCreator newFactory = new()
+                EventFactoryCreator newFactory = new()
                 {
                     Name = "Новое событие",
                     DefaultTimeSpan = TimeSpan.FromSeconds(10),
@@ -55,21 +55,31 @@ internal class EventConstructorViewModel : ReactiveObject
         AddPlayerParameterCommand = ReactiveCommand.Create
         (
             () => SelectedFactoryCreator.ParameterFactories
-                                        .Add(new CustomPlayerEventParameterFactory()),
+                                        .Add(new PlayerEventParameterFactory
+                                        {
+                                            Name = "Игрок",
+                                            TeamName = "Команда",
+                                        }),
             isSelected
         );
 
         AddTeamParameterCommand = ReactiveCommand.Create
         (
             () => SelectedFactoryCreator.ParameterFactories
-                                        .Add(new CustomTeamEventParameterFactory()),
+                                        .Add(new TeamEventParameterFactory
+                                        {
+                                            Name = "Игрок",
+                                        }),
             isSelected
         );
 
         AddTextParameterCommand = ReactiveCommand.Create
         (
             () => SelectedFactoryCreator.ParameterFactories
-                                        .Add(new CustomTextEventParameterFactory()),
+                                        .Add(new TextEventParameterFactory
+                                        {
+                                            Name = "Текст",
+                                        }),
             isSelected
         );
     }
