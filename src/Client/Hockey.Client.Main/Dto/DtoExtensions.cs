@@ -36,16 +36,26 @@ public static class DtoExtensions
             TeamId = teamDic[x.team]
         }).ToArray();
 
-        TeamDto guestTeamDto = new()
+        var teamsDto = teams.Select(x => new TeamDto
         {
-            Id = teamDic[store.GuestTeam],
-            Name = store.GuestTeam.Name
-        };
+            Id = teamDic[x],
+            Name = x.Name
+        });
 
-        TeamDto homeTeamDto = new()
+        var guestTeamId = teamDic[store.GuestTeam];
+        var homeTeamId = teamDic[store.HomeTeam];
+
+        var types = store.EventFactories
+                         .Select(x => x.EventType)
+                         .ToArray();
+
+        var typeDic = types.GetIdDictionary();
+        var typesDto = types.Select(x => new EventTypeDto
         {
-            Id = teamDic[store.HomeTeam],
-            Name = store.HomeTeam.Name
-        };
+            Id = typeDic[x],
+            Name = x.Name
+        }).ToList();
+
+
     }
 }

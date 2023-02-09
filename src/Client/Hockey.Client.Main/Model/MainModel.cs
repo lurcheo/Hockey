@@ -24,17 +24,22 @@ internal class MainModel : ReactiveObject, IMainModel
     public IVideoService VideoService { get; }
     public IGameStore GameStore { get; }
     public IEventAggregator EventAggregator { get; }
+
     [Reactive] public Mat CurrentFrame { get; set; }
+
     [Reactive] public bool IsPaused { get; set; }
     [Reactive] public bool IsUserClick { get; set; }
     [Reactive] public bool IsPlayEvent { get; set; } = false;
 
-    [Reactive] public long FrameNumber { get; set; } = 0;
     [Reactive] public int MillisecondsPerFrame { get; set; } = 0;
-    [Reactive] public long EndFrameNumber { get; set; } = 0;
-    [Reactive] public PlayingState PlayingState { get; set; }
+    [Reactive] public long FrameNumber { get; set; } = 0;
+    [Reactive] public long FramesCount { get; set; } = 0;
+    [Reactive] public long EndEventFrameNumber { get; set; } = 0;
 
-    [Reactive] public long FramesCount { get; set; } = 100;
+    [Reactive] public TimeSpan CurrentTime { get; set; }
+    [Reactive] public TimeSpan EndTime { get; set; }
+
+    [Reactive] public PlayingState PlayingState { get; set; }
 
     private IVideoReader videoReader;
 
@@ -46,11 +51,15 @@ internal class MainModel : ReactiveObject, IMainModel
         EventAggregator = eventAggregator;
 
         this.WhenAnyValue(x => x.FrameNumber)
-            .Do(x => GameStore.FrameNumber = x)
+            .Do(x => CurrentTime = TimeSpan.FromMilliseconds(x * MillisecondsPerFrame))
             .Where(_ => videoReader is not null && IsUserClick)
             .Throttle(TimeSpan.FromMilliseconds(200))
             .ObserveOnDispatcher()
             .Subscribe(SetPosition)
+            .Cache();
+
+        this.WhenAnyValue(x => x.CurrentTime)
+            .Subscribe(x => GameStore.CurrentTime = x)
             .Cache();
 
         EventAggregator.GetEvent<PlayEvent>()
@@ -98,8 +107,7 @@ internal class MainModel : ReactiveObject, IMainModel
                 PlayingState = PlayingState.PlayVideo;
                 MillisecondsPerFrame = videoReader.MillisecondsPerFrame;
                 FramesCount = videoReader.FramesCount;
-
-                GameStore.MillisecondsPerFrame = MillisecondsPerFrame;
+                EndTime = TimeSpan.FromMilliseconds(FramesCount * MillisecondsPerFrame);
 
                 var st = Stopwatch.StartNew();
 
@@ -107,7 +115,7 @@ internal class MainModel : ReactiveObject, IMainModel
                 {
                     lock (this)
                     {
-                        if (PlayingState == PlayingState.PlayEvent && FrameNumber >= EndFrameNumber)
+                        if (PlayingState == PlayingState.PlayEvent && FrameNumber >= EndEventFrameNumber)
                         {
                             IsPaused = true;
                             PlayingState = PlayingState.PlayVideo;
@@ -153,11 +161,11 @@ internal class MainModel : ReactiveObject, IMainModel
 
     public void PlayEvent(EventInfo eventInfo)
     {
-        SetPosition(eventInfo.StartEventFrameNumber);
+        SetPosition((long)(eventInfo.StartEventTime.TotalMilliseconds / MillisecondsPerFrame));
 
         lock (this)
         {
-            EndFrameNumber = eventInfo.EndEventFrameNumber;
+            EndEventFrameNumber = (long)(eventInfo.EndEventTime.TotalMilliseconds / MillisecondsPerFrame);
             PlayingState = PlayingState.PlayEvent;
             IsPaused = false;
             IsPlayEvent = true;

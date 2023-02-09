@@ -9,9 +9,8 @@ internal class EventInfo : ReactiveObject
 {
     [Reactive] public EventType EventType { get; set; }
 
-    [Reactive] public long StartEventFrameNumber { get; set; }
-    [Reactive] public long EndEventFrameNumber { get; set; }
-    [Reactive] public int MillisecondsPerFrame { get; set; }
+    [Reactive] public TimeSpan StartEventTime { get; set; }
+    [Reactive] public TimeSpan EndEventTime { get; set; }
 
     [Reactive] public TimeSpan DefaultDuration { get; set; }
 

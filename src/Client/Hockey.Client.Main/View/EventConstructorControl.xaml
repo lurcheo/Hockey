@@ -93,10 +93,7 @@
             </GroupBox.Header>
             <StackPanel>
                 <TextBox md:HintAssist.Hint="Наименование" Text="{Binding SelectedFactoryCreator.EventType.Name}" />
-                <TextBox
-                    md:HintAssist.Hint="Длительность по умолчанию"
-                    IsReadOnly="True"
-                    Text="{Binding SelectedFactoryCreator.DefaultTimeSpan}" />
+                <TextBox md:HintAssist.Hint="Длительность по умолчанию" Text="{Binding SelectedFactoryCreator.DefaultTimeSpan, StringFormat=\{0:h\\:mm\\:ss\}}" />
             </StackPanel>
         </GroupBox>
         <GroupBox Grid.Row="2" Style="{StaticResource MaterialDesignCardGroupBox}">

@@ -55,10 +55,9 @@ internal class EventModel : ReactiveObject, IEventModel
     public EventInfo CreateEvent(EventFactory factory)
     {
         var eventInfo = factory.Create();
-        eventInfo.MillisecondsPerFrame = Store.MillisecondsPerFrame;
 
-        eventInfo.StartEventFrameNumber = Store.FrameNumber;
-        eventInfo.EndEventFrameNumber = eventInfo.StartEventFrameNumber + (long)(eventInfo.DefaultDuration.TotalMilliseconds / eventInfo.MillisecondsPerFrame);
+        eventInfo.StartEventTime = Store.CurrentTime;
+        eventInfo.EndEventTime = eventInfo.StartEventTime + eventInfo.DefaultDuration;
 
         return eventInfo;
     }

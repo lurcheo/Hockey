@@ -67,23 +67,9 @@
                                     VerticalAlignment="Center"
                                     Text="{Binding EventType.Name}" />
                                 <TextBlock Grid.Row="1" Grid.Column="0">
-                                    <Run>
-                                        <Run.Text>
-                                            <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
-                                                <Binding Path="StartEventFrameNumber" />
-                                                <Binding Path="MillisecondsPerFrame" />
-                                            </MultiBinding>
-                                        </Run.Text>
-                                    </Run>
+                                    <Run Text="{Binding StartEventTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
                                     <Run Text="-" />
-                                    <Run>
-                                        <Run.Text>
-                                            <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
-                                                <Binding Path="EndEventFrameNumber" />
-                                                <Binding Path="MillisecondsPerFrame" />
-                                            </MultiBinding>
-                                        </Run.Text>
-                                    </Run>
+                                    <Run Text="{Binding EndEventTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
                                 </TextBlock>
                                 <Button
                                     Grid.Row="0"
@@ -118,29 +104,13 @@
                         <TextBox
                             md:HintAssist.Hint="Время начала события"
                             DataContext="{Binding SelectedEvent}"
-                            IsHitTestVisible="False"
-                            IsReadOnly="True">
-                            <TextBox.Text>
-                                <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
-                                    <Binding Path="StartEventFrameNumber" />
-                                    <Binding Path="MillisecondsPerFrame" />
-                                </MultiBinding>
-                            </TextBox.Text>
-                        </TextBox>
+                            Text="{Binding StartEventTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
                     </Border>
                     <Border Style="{StaticResource parametersBorder}">
                         <TextBox
                             md:HintAssist.Hint="Время конца события"
                             DataContext="{Binding SelectedEvent}"
-                            IsHitTestVisible="False"
-                            IsReadOnly="True">
-                            <TextBox.Text>
-                                <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
-                                    <Binding Path="EndEventFrameNumber" />
-                                    <Binding Path="MillisecondsPerFrame" />
-                                </MultiBinding>
-                            </TextBox.Text>
-                        </TextBox>
+                            Text="{Binding EndEventTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
                     </Border>
                     <ItemsControl ItemsSource="{Binding SelectedEvent.Parameters}">
                         <ItemsControl.Resources>

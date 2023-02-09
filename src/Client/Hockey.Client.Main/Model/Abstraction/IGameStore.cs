@@ -1,6 +1,7 @@
 ﻿using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
 using ReactiveUI;
+using System;
 using System.Collections.ObjectModel;
 
 namespace Hockey.Client.Main.Model.Abstraction;
@@ -11,6 +12,5 @@ internal interface IGameStore : IReactiveObject
     ObservableCollection<EventFactory> EventFactories { get; set; }
     TeamInfo HomeTeam { get; set; }
     TeamInfo GuestTeam { get; set; }
-    long FrameNumber { get; set; }
-    int MillisecondsPerFrame { get; set; }
+    TimeSpan CurrentTime { get; set; }
 }

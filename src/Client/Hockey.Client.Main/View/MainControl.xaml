@@ -151,23 +151,9 @@
                         Grid.Column="1"
                         VerticalAlignment="Center"
                         DataContext="{Binding Model}">
-                        <Run>
-                            <Run.Text>
-                                <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
-                                    <Binding Path="FrameNumber" />
-                                    <Binding Path="MillisecondsPerFrame" />
-                                </MultiBinding>
-                            </Run.Text>
-                        </Run>
+                        <Run Text="{Binding CurrentTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
                         <Run Text="/" />
-                        <Run>
-                            <Run.Text>
-                                <MultiBinding Converter="{cv:TimeSpanConverter}" StringFormat="{}{0:hh\:mm\:ss}">
-                                    <Binding Path="FramesCount" />
-                                    <Binding Path="MillisecondsPerFrame" />
-                                </MultiBinding>
-                            </Run.Text>
-                        </Run>
+                        <Run Text="{Binding EndTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
                     </TextBlock>
                     <UniformGrid
                         Grid.Row="1"

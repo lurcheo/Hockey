@@ -3,6 +3,7 @@ using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -15,8 +16,7 @@ internal class GameStore : ReactiveObject, IGameStore
 
     [Reactive] public TeamInfo HomeTeam { get; set; }
     [Reactive] public TeamInfo GuestTeam { get; set; }
-    [Reactive] public long FrameNumber { get; set; }
-    [Reactive] public int MillisecondsPerFrame { get; set; } = 1;
+    [Reactive] public TimeSpan CurrentTime { get; set; }
 
     public GameStore(IEnumerable<EventInfo> events, IEnumerable<EventFactory> factories, TeamInfo homeTeam, TeamInfo guestTeam)
     {
@@ -25,5 +25,13 @@ internal class GameStore : ReactiveObject, IGameStore
 
         HomeTeam = homeTeam;
         GuestTeam = guestTeam;
+
+        //EventFactories.ToRemoveObservable()
+        //              .Select(x => x.EventType)
+        //              .Select(x => Events.Where(ev => ev.EventType == x))
+        //              .Select(x => x.ToArray())
+        //              .SelectMany(x => x)
+        //              .Subscribe(x => Events.Remove(x))
+        //              .Cache();
     }
 }
