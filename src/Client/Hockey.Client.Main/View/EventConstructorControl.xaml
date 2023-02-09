@@ -30,8 +30,9 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*" />
-            <RowDefinition Height="7*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Style="{StaticResource MaterialDesignCardGroupBox}">
             <GroupBox.Header>
@@ -48,15 +49,38 @@
                         Content="{md:PackIcon Kind=PlusBox}" />
                 </UniformGrid>
             </GroupBox.Header>
-            <DataGrid ItemsSource="{Binding Model.FactoryCreators}" SelectedItem="{Binding SelectedFactoryCreator}">
+            <DataGrid ItemsSource="{Binding Model.Factories}" SelectedItem="{Binding SelectedFactoryCreator}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Name}" Header="Наименование" />
-                    <DataGridTextColumn Binding="{Binding DefaultTimeSpan}" Header="Длительность по умолчанию" />
-                    <DataGridTextColumn Binding="{Binding IsCreated, Converter={cv:BooleanTextConverter}, ConverterParameter='Не доступен___Доступен'}" Header="Доступен к редактированию" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding EventType.Name}"
+                        Header="Наименование" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding DefaultTimeSpan}"
+                        Header="Длительность по умолчанию" />
+                    <DataGridTemplateColumn Width="auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Margin="0"
+                                    Padding="0"
+                                    Command="{Binding DataContext.DeleteEventFactoryCommand, ElementName=Root}"
+                                    CommandParameter="{Binding}"
+                                    Content="{md:PackIcon Kind=Trash}"
+                                    Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                    Style="{StaticResource IconButton}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
-        <GroupBox Grid.Row="1" IsEnabled="{Binding SelectedFactoryCreator.IsCreated, Converter={cv:ReverseBoolConverter}}">
+        <GroupBox
+            Grid.Row="1"
+            Padding="10"
+            IsEnabled="{Binding SelectedFactoryCreator.IsCreated, Converter={cv:ReverseBoolConverter}}"
+            Style="{StaticResource MaterialDesignCardGroupBox}">
             <GroupBox.Header>
                 <UniformGrid Rows=" 1">
                     <TextBlock
@@ -65,115 +89,158 @@
                         Foreground="{DynamicResource MaterialDesignPaper}"
                         Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
                         Text="Редактирование кастомного события" />
-                    <Button
-                        HorizontalAlignment="Right"
-                        Command="{Binding CreateSelectedFactoryCommand}"
-                        Content="{md:PackIcon Kind=Create}" />
                 </UniformGrid>
             </GroupBox.Header>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+            <StackPanel>
+                <TextBox md:HintAssist.Hint="Наименование" Text="{Binding SelectedFactoryCreator.EventType.Name}" />
                 <TextBox
-                    Grid.Row="0"
-                    md:HintAssist.Hint="Наименование"
-                    Text="{Binding SelectedFactoryCreator.Name, Mode=TwoWay}" />
-                <TextBox
-                    Grid.Row="1"
                     md:HintAssist.Hint="Длительность по умолчанию"
                     IsReadOnly="True"
                     Text="{Binding SelectedFactoryCreator.DefaultTimeSpan}" />
-                <GroupBox Grid.Row="2">
-                    <GroupBox.Header>
-                        <UniformGrid Rows=" 1">
-                            <TextBlock
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Foreground="{DynamicResource MaterialDesignPaper}"
-                                Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
-                                Text="Параметры кастомного события" />
-                            <Menu HorizontalAlignment="Right">
-                                <MenuItem Header="{md:PackIcon Kind=PlusBox}">
-                                    <MenuItem Command="{Binding AddPlayerParameterCommand}" Header="Игрок" />
-                                    <MenuItem Command="{Binding AddTeamParameterCommand}" Header="Команда" />
-                                    <MenuItem Command="{Binding AddTextParameterCommand}" Header="Текст" />
-                                </MenuItem>
-                            </Menu>
-                        </UniformGrid>
-                    </GroupBox.Header>
-                    <ItemsControl ItemsSource="{Binding SelectedFactoryCreator.ParameterFactories}">
-                        <ItemsControl.Resources>
-                            <DataTemplate DataType="{x:Type ev:PlayerEventParameterFactory}">
-                                <Border Style="{StaticResource parametersBorder}">
-                                    <UniformGrid Rows="2">
-                                        <TextBox
-                                            Margin="10"
-                                            Padding="5"
-                                            md:HintAssist.Hint="Наименование параметра игрока"
-                                            Text="{Binding Name}" />
-                                        <TextBox
-                                            Margin="10"
-                                            Padding="5"
-                                            md:HintAssist.Hint="Наименование параметра команды"
-                                            Text="{Binding TeamName}" />
-                                        <ComboBox
-                                            Margin="10"
-                                            Padding="5"
-                                            md:HintAssist.Hint="Команда по умолчанию"
-                                            DisplayMemberPath="Name"
-                                            ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
-                                            SelectedItem="{Binding DefaultTeam}" />
-                                        <ComboBox
-                                            Margin="10"
-                                            Padding="5"
-                                            md:HintAssist.Hint="Игрок по умолчанию"
-                                            DisplayMemberPath="Name"
-                                            ItemsSource="{Binding DefaultTeam.Players}"
-                                            SelectedItem="{Binding DefaultPlayer}" />
-                                    </UniformGrid>
-                                </Border>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type ev:TeamEventParameterFactory}">
-                                <Border Style="{StaticResource parametersBorder}">
-                                    <UniformGrid Rows="1">
-                                        <TextBox
-                                            Margin="10"
-                                            Padding="5"
-                                            md:HintAssist.Hint="Наименование параметра команды"
-                                            Text="{Binding Name}" />
-                                        <ComboBox
-                                            Margin="10"
-                                            Padding="5"
-                                            md:HintAssist.Hint="Команда по умолчанию"
-                                            DisplayMemberPath="Name"
-                                            ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
-                                            SelectedItem="{Binding DefaultTeam}" />
-                                    </UniformGrid>
-                                </Border>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type ev:TextEventParameterFactory}">
-                                <Border Style="{StaticResource parametersBorder}">
-                                    <UniformGrid Rows="1">
-                                        <TextBox
-                                            Margin="10"
-                                            Padding="5"
-                                            md:HintAssist.Hint="Наименование параметра команды"
-                                            Text="{Binding Name}" />
-                                        <TextBox
-                                            Margin="10"
-                                            Padding="5"
-                                            md:HintAssist.Hint="Значение текста по умолчанию"
-                                            Text="{Binding DefaultText}" />
-                                    </UniformGrid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.Resources>
-                    </ItemsControl>
-                </GroupBox>
-            </Grid>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="2" Style="{StaticResource MaterialDesignCardGroupBox}">
+            <GroupBox.Header>
+                <UniformGrid Rows=" 1">
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource MaterialDesignPaper}"
+                        Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                        Text="Параметры кастомного события" />
+                    <Menu HorizontalAlignment="Right">
+                        <MenuItem Header="{md:PackIcon Kind=PlusBox}">
+                            <MenuItem Command="{Binding AddPlayerParameterCommand}" Header="Игрок" />
+                            <MenuItem Command="{Binding AddTeamParameterCommand}" Header="Команда" />
+                            <MenuItem Command="{Binding AddTextParameterCommand}" Header="Текст" />
+                        </MenuItem>
+                    </Menu>
+                </UniformGrid>
+            </GroupBox.Header>
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding SelectedFactoryCreator.ParameterFactories}">
+                    <ItemsControl.Resources>
+                        <DataTemplate DataType="{x:Type ev:PlayerEventParameterFactory}">
+                            <Border Style="{StaticResource parametersBorder}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBox
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Margin="10"
+                                        Padding="5"
+                                        md:HintAssist.Hint="Наименование параметра игрока"
+                                        Text="{Binding Name}" />
+                                    <TextBox
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Margin="10"
+                                        Padding="5"
+                                        md:HintAssist.Hint="Наименование параметра команды"
+                                        Text="{Binding TeamName}" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Margin="10"
+                                        Padding="5"
+                                        md:HintAssist.Hint="Команда по умолчанию"
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
+                                        SelectedItem="{Binding DefaultTeam}" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="10"
+                                        Padding="5"
+                                        md:HintAssist.Hint="Игрок по умолчанию"
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding DefaultTeam.Players}"
+                                        SelectedItem="{Binding DefaultPlayer}" />
+                                    <Button
+                                        Grid.Row="0"
+                                        Grid.RowSpan="2"
+                                        Grid.Column="2"
+                                        Command="{Binding DataContext.DeleteParameterFactoryCommand, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Content="{md:PackIcon Kind=Trash}"
+                                        Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                        Style="{StaticResource IconButton}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type ev:TeamEventParameterFactory}">
+                            <Border Style="{StaticResource parametersBorder}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        Grid.Column="0"
+                                        Margin="10"
+                                        Padding="5"
+                                        md:HintAssist.Hint="Наименование параметра команды"
+                                        Text="{Binding Name}" />
+                                    <ComboBox
+                                        Grid.Column="1"
+                                        Margin="10"
+                                        Padding="5"
+                                        md:HintAssist.Hint="Команда по умолчанию"
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding DataContext.Model.Teams, ElementName=Root}"
+                                        SelectedItem="{Binding DefaultTeam}" />
+                                    <Button
+                                        Grid.Column="2"
+                                        Command="{Binding DataContext.DeleteParameterFactoryCommand, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Content="{md:PackIcon Kind=Trash}"
+                                        Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                        Style="{StaticResource IconButton}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type ev:TextEventParameterFactory}">
+                            <Border Style="{StaticResource parametersBorder}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        Grid.Column="0"
+                                        Margin="10"
+                                        Padding="5"
+                                        md:HintAssist.Hint="Наименование параметра команды"
+                                        Text="{Binding Name}" />
+                                    <TextBox
+                                        Grid.Column="1"
+                                        Margin="10"
+                                        Padding="5"
+                                        md:HintAssist.Hint="Значение текста по умолчанию"
+                                        Text="{Binding DefaultText}" />
+                                    <Button
+                                        Grid.Column="2"
+                                        Command="{Binding DataContext.DeleteParameterFactoryCommand, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Content="{md:PackIcon Kind=Trash}"
+                                        Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                        Style="{StaticResource IconButton}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.Resources>
+                </ItemsControl>
+            </ScrollViewer>
         </GroupBox>
     </Grid>
 </UserControl>

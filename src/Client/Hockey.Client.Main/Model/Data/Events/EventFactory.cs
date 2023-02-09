@@ -1,38 +1,52 @@
-﻿using System.Linq;
+﻿using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Hockey.Client.Main.Model.Data.Events;
 
-internal class EventFactory
+internal class EventFactory : ReactiveObject
 {
-    public EventType EventType { get; }
-    public EventFactoryCreator FactoryCreator { get; }
+    [Reactive] public EventType EventType { get; set; }
+    [Reactive] public TimeSpan DefaultTimeSpan { get; set; }
+    [Reactive] public bool IsCreated { get; private set; }
 
-    public EventFactory(EventFactoryCreator factoryCreator)
+    public ObservableCollection<EventParameterFactory> ParameterFactories { get; }
+
+    public EventFactory()
     {
-        FactoryCreator = factoryCreator;
-        EventType = new(factoryCreator.Name);
+        ParameterFactories = new();
+    }
+
+    public EventFactory(IEnumerable<EventParameterFactory> factories)
+    {
+        ParameterFactories = new(factories);
     }
 
     public EventInfo Create()
     {
         return new EventInfo(EventType,
-                             FactoryCreator.DefaultTimeSpan,
-                             FactoryCreator.ParameterFactories
-                                           .Select(x => x switch
-                                           {
-                                               PlayerEventParameterFactory f => new PlayerEventParameter(f.TeamName, f.Name)
-                                               {
-                                                   Player = f.DefaultPlayer,
-                                                   Team = f.DefaultTeam,
-                                               } as EventParameter,
-                                               TeamEventParameterFactory f => new TeamEventParameter(f.Name)
-                                               {
-                                                   Team = f.DefaultTeam,
-                                               },
-                                               TextEventParameterFactory f => new TextEventParameter(f.Name)
-                                               {
-                                                   Text = f.DefaultText
-                                               },
-                                           }).ToArray());
+                             DefaultTimeSpan,
+                             ParameterFactories.Select
+                             (
+                                 x => x switch
+                                 {
+                                     PlayerEventParameterFactory f => new PlayerEventParameter(f.TeamName, f.Name)
+                                     {
+                                         Player = f.DefaultPlayer,
+                                         Team = f.DefaultTeam,
+                                     } as EventParameter,
+                                     TeamEventParameterFactory f => new TeamEventParameter(f.Name)
+                                     {
+                                         Team = f.DefaultTeam,
+                                     },
+                                     TextEventParameterFactory f => new TextEventParameter(f.Name)
+                                     {
+                                         Text = f.DefaultText
+                                     },
+                                 }
+                             ).ToArray());
     }
 }

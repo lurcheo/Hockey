@@ -9,8 +9,6 @@ internal interface IGameStore : IReactiveObject
 {
     ObservableCollection<EventInfo> Events { get; set; }
     ObservableCollection<EventFactory> EventFactories { get; set; }
-    ObservableCollection<EventFactoryCreator> FactoryCreators { get; set; }
-
     TeamInfo HomeTeam { get; set; }
     TeamInfo GuestTeam { get; set; }
     long FrameNumber { get; set; }

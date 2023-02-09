@@ -1,3 +1,14 @@
-﻿namespace Hockey.Client.Main.Model.Data.Events;
+﻿using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-internal record EventType(string Name);
+namespace Hockey.Client.Main.Model.Data.Events;
+
+internal class EventType : ReactiveObject
+{
+	[Reactive] public string Name { get; set; }
+
+	public EventType(string name)
+	{
+		Name = name;
+	}
+}

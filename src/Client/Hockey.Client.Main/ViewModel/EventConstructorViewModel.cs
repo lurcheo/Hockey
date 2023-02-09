@@ -12,42 +12,46 @@ namespace Hockey.Client.Main.ViewModel;
 internal class EventConstructorViewModel : ReactiveObject
 {
     public IEventConstructorModel Model { get; }
-    [Reactive] public EventFactoryCreator SelectedFactoryCreator { get; set; }
+    [Reactive] public EventFactory SelectedFactoryCreator { get; set; }
 
-
+    public ICommand DeleteEventFactoryCommand { get; }
     public ICommand AddEventFactoryCommand { get; }
+    public ICommand DeleteParameterFactoryCommand { get; }
     public ICommand AddPlayerParameterCommand { get; }
     public ICommand AddTeamParameterCommand { get; }
     public ICommand AddTextParameterCommand { get; }
-    public ICommand CreateSelectedFactoryCommand { get; }
 
     public EventConstructorViewModel(IEventConstructorModel model)
     {
         Model = model;
 
-        SelectedFactoryCreator = Model.FactoryCreators.FirstOrDefault();
+        SelectedFactoryCreator = Model.Factories.FirstOrDefault();
 
         var isSelected = this.WhenAnyValue(x => x.SelectedFactoryCreator)
                              .Select(x => x is not null);
 
-        CreateSelectedFactoryCommand = ReactiveCommand.Create
+        DeleteEventFactoryCommand = ReactiveCommand.Create<EventFactory>
         (
-            () => Model.AddEventFactory(SelectedFactoryCreator),
-            isSelected.CombineLatest(this.WhenAnyValue(x => x.SelectedFactoryCreator.IsCreated),
-                                     (s, c) => s && !c)
+            x => Model.Factories.Remove(x)
+        );
+
+        DeleteParameterFactoryCommand = ReactiveCommand.Create<EventParameterFactory>
+        (
+            x => SelectedFactoryCreator.ParameterFactories.Remove(x),
+            isSelected
         );
 
         AddEventFactoryCommand = ReactiveCommand.Create
         (
             () =>
             {
-                EventFactoryCreator newFactory = new()
+                EventFactory newFactory = new()
                 {
-                    Name = "Новое событие",
+                    EventType = new("Новое событие"),
                     DefaultTimeSpan = TimeSpan.FromSeconds(10),
                 };
 
-                Model.FactoryCreators.Add(newFactory);
+                Model.Factories.Add(newFactory);
                 SelectedFactoryCreator = newFactory;
             }
         );

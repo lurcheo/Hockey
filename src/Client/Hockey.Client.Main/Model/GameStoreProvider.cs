@@ -16,21 +16,20 @@ internal class GameStoreProvider : IGameStoreProvider
         var factories = GetDefaultEventFactoryCreators();
 
         var store = new GameStore(Enumerable.Empty<EventInfo>(),
-                             factories.Select(x => x.CreateFactory()),
-                             factories,
-                             GetDefaultHomeTeam(),
-                             GetDefaultGuestTeam());
+                                  factories,
+                                  GetDefaultHomeTeam(),
+                                  GetDefaultGuestTeam());
 
         store.Save();
 
         return store;
     }
 
-    private static IEnumerable<EventFactoryCreator> GetDefaultEventFactoryCreators()
+    private static IEnumerable<EventFactory> GetDefaultEventFactoryCreators()
     {
-        return new EventFactoryCreator[]
+        return new EventFactory[]
         {
-            new EventFactoryCreator
+            new EventFactory
             (
                 new EventParameterFactory[]
                 {
@@ -46,10 +45,10 @@ internal class GameStoreProvider : IGameStoreProvider
                 }
             )
             {
-                Name = "Гол",
+                EventType = new("Гол"),
                 DefaultTimeSpan = TimeSpan.FromSeconds(10),
             },
-            new EventFactoryCreator
+            new EventFactory
             (
                 new EventParameterFactory[]
                 {
@@ -70,10 +69,10 @@ internal class GameStoreProvider : IGameStoreProvider
                 }
             )
             {
-                Name = "Толчок",
+                EventType = new("Толчок"),
                 DefaultTimeSpan = TimeSpan.FromSeconds(10),
             },
-            new EventFactoryCreator
+            new EventFactory
             (
                 new EventParameterFactory[]
                 {
@@ -88,10 +87,10 @@ internal class GameStoreProvider : IGameStoreProvider
                 }
             )
             {
-                Name = "Игра в меньшинстве",
+                EventType = new("Игра в меньшинстве"),
                 DefaultTimeSpan = TimeSpan.FromSeconds(10),
             },
-            new EventFactoryCreator
+            new EventFactory
             (
                 new EventParameterFactory[]
                 {
@@ -106,7 +105,7 @@ internal class GameStoreProvider : IGameStoreProvider
                 }
             )
             {
-                Name = "Игра в большинстве",
+                EventType = new("Игра в большинстве"),
                 DefaultTimeSpan = TimeSpan.FromSeconds(10),
             }
         };

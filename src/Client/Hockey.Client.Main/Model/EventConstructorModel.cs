@@ -12,7 +12,7 @@ namespace Hockey.Client.Main.Model;
 
 internal class EventConstructorModel : ReactiveObject, IEventConstructorModel
 {
-	public ObservableCollection<EventFactoryCreator> FactoryCreators { get; set; }
+	public ObservableCollection<EventFactory> Factories { get; set; }
 	[Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
 	public IGameStore Store { get; }
 
@@ -20,8 +20,8 @@ internal class EventConstructorModel : ReactiveObject, IEventConstructorModel
 	{
 		Store = store;
 
-		Store.WhenAnyValue(x => x.FactoryCreators)
-			 .Subscribe(x => FactoryCreators = x)
+		Store.WhenAnyValue(x => x.EventFactories)
+			 .Subscribe(x => Factories = x)
 			 .Cache();
 
 
@@ -30,10 +30,5 @@ internal class EventConstructorModel : ReactiveObject, IEventConstructorModel
 						   (home, guest) => new[] { home, guest })
 			.Subscribe(x => Teams = x)
 			.Cache();
-	}
-
-	public void AddEventFactory(EventFactoryCreator factoryCreator)
-	{
-		Store.EventFactories.Add(factoryCreator.CreateFactory());
 	}
 }

@@ -8,8 +8,6 @@ namespace Hockey.Client.Main.Model.Abstraction;
 
 internal interface IEventConstructorModel : IReactiveObject
 {
-    ObservableCollection<EventFactoryCreator> FactoryCreators { get; set; }
+    ObservableCollection<EventFactory> Factories { get; set; }
     IEnumerable<TeamInfo> Teams { get; set; }
-
-    void AddEventFactory(EventFactoryCreator factoryCreator);
 }
