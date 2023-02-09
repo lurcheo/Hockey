@@ -11,7 +11,6 @@ internal class EventFactory : ReactiveObject
 {
     [Reactive] public EventType EventType { get; set; }
     [Reactive] public TimeSpan DefaultTimeSpan { get; set; }
-    [Reactive] public bool IsCreated { get; private set; }
 
     public ObservableCollection<EventParameterFactory> ParameterFactories { get; }
 

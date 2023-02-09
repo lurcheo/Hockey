@@ -64,6 +64,7 @@ internal class EventModel : ReactiveObject, IEventModel
 
     public void PlayEvent(EventInfo eventInfo)
     {
-        EventAggregator.GetEvent<PlayEvent>().Publish(eventInfo);
+        EventAggregator.GetEvent<PlayEvent>()
+                       .Publish(eventInfo);
     }
 }

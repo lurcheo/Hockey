@@ -104,11 +104,22 @@ internal class TeamViewModel : ReactiveObject
             .Subscribe(x => Links = x)
             .Cache();
 
-        SelectedLink = Links.First();
-
         var linkChanged = this.WhenAnyValue(x => x.SelectedLink)
                               .WhereNotNull();
 
+        this.WhenAnyValue(x => x.Links)
+            .WithLatestFrom
+            (
+                this.WhenAnyValue(x => x.SelectedLink)
+                    .WhereNotNull()
+                    .Merge(Observable.Return(Links.First())),
+                (links, link) => (links, link)
+            ).Subscribe(x =>
+            {
+                SelectedLink = x.links.FirstOrDefault(l => l.Number == x.link.Number)
+                                                           ?? x.links.MaxBy(x => x.Number);
+            })
+            .Cache();
 
         var playersChanged = Model.WhenAnyValue(x => x.Team)
                                   .Select(x => x.Players)

@@ -67,7 +67,8 @@
                                     Padding="0"
                                     Command="{Binding DataContext.DeleteEventFactoryCommand, ElementName=Root}"
                                     CommandParameter="{Binding}"
-                                    Content="{md:PackIcon Kind=Trash}"
+                                    Content="{md:PackIcon Kind=Trash,
+                                                          Size=18}"
                                     Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
                                     Style="{StaticResource IconButton}" />
                             </DataTemplate>
@@ -88,7 +89,7 @@
                         VerticalAlignment="Center"
                         Foreground="{DynamicResource MaterialDesignPaper}"
                         Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
-                        Text="Редактирование кастомного события" />
+                        Text="Редактирование события" />
                 </UniformGrid>
             </GroupBox.Header>
             <StackPanel>
@@ -104,7 +105,7 @@
                         VerticalAlignment="Center"
                         Foreground="{DynamicResource MaterialDesignPaper}"
                         Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
-                        Text="Параметры кастомного события" />
+                        Text="Параметры события" />
                     <Menu HorizontalAlignment="Right">
                         <MenuItem Header="{md:PackIcon Kind=PlusBox}">
                             <MenuItem Command="{Binding AddPlayerParameterCommand}" Header="Игрок" />
@@ -165,9 +166,11 @@
                                         Grid.Row="0"
                                         Grid.RowSpan="2"
                                         Grid.Column="2"
+                                        VerticalAlignment="Top"
                                         Command="{Binding DataContext.DeleteParameterFactoryCommand, ElementName=Root}"
                                         CommandParameter="{Binding}"
-                                        Content="{md:PackIcon Kind=Trash}"
+                                        Content="{md:PackIcon Kind=Trash,
+                                                              Size=18}"
                                         Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
                                         Style="{StaticResource IconButton}" />
                                 </Grid>
@@ -197,9 +200,11 @@
                                         SelectedItem="{Binding DefaultTeam}" />
                                     <Button
                                         Grid.Column="2"
+                                        VerticalAlignment="Top"
                                         Command="{Binding DataContext.DeleteParameterFactoryCommand, ElementName=Root}"
                                         CommandParameter="{Binding}"
-                                        Content="{md:PackIcon Kind=Trash}"
+                                        Content="{md:PackIcon Kind=Trash,
+                                                              Size=18}"
                                         Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
                                         Style="{StaticResource IconButton}" />
                                 </Grid>
@@ -227,9 +232,11 @@
                                         Text="{Binding DefaultText}" />
                                     <Button
                                         Grid.Column="2"
+                                        VerticalAlignment="Top"
                                         Command="{Binding DataContext.DeleteParameterFactoryCommand, ElementName=Root}"
                                         CommandParameter="{Binding}"
-                                        Content="{md:PackIcon Kind=Trash}"
+                                        Content="{md:PackIcon Kind=Trash,
+                                                              Size=18}"
                                         Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
                                         Style="{StaticResource IconButton}" />
                                 </Grid>

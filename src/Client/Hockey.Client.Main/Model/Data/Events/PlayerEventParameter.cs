@@ -1,8 +1,4 @@
-﻿using Hockey.Client.Shared.Extensions;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using System;
-using System.Reactive.Linq;
+﻿using ReactiveUI.Fody.Helpers;
 
 namespace Hockey.Client.Main.Model.Data.Events;
 
@@ -16,12 +12,5 @@ internal class PlayerEventParameter : EventParameter
         : base(name)
     {
         TeamName = teamName;
-
-        this.WhenAnyValue(x => x.Team)
-            .WhereNotNull()
-            .Where(x => x.Players.Count > 0)
-            .Select(x => x.Players[0])
-            .Subscribe(x => Player = x)
-            .Cache();
     }
 }
