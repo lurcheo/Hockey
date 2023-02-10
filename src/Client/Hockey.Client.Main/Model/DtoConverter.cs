@@ -15,8 +15,19 @@ internal class DtoConverter : IDtoConverter
         ReadTeams(storeDto, out var teamDictionary, out var guestTeam, out var homeTeam);
         ReadPlayers(storeDto, teamDictionary, out var playerDictionary);
 
+        ReadTypes(storeDto, out var eventTypesDictionary);
+
+        var eventFactories = ReadEventFactories(storeDto, eventTypesDictionary, out var eventFactoryDictionary);
+        ReadEventFactoryParameters(storeDto, eventFactoryDictionary, playerDictionary, teamDictionary);
+
+        var events = ReadEvents(storeDto, eventTypesDictionary, out var eventsDictionary);
+        ReadEventsParameters(storeDto, eventsDictionary, playerDictionary, teamDictionary);
+
         store.GuestTeam = guestTeam;
         store.HomeTeam = homeTeam;
+        store.EventFactories = new(eventFactories);
+        store.Events = new(events);
+        store.VideoPath = storeDto.VideoPath;
     }
 
     private static void ReadTeams(GameProjectDto store,
@@ -43,6 +54,136 @@ internal class DtoConverter : IDtoConverter
          }, out playerDictionary);
     }
 
+    private static void ReadTypes(GameProjectDto store, out IReadOnlyDictionary<int, EventType> eventTypeDictionary)
+    {
+        store.EventTypes.GetIdDictionaryFromDto(x => new EventType(x.Name), out eventTypeDictionary);
+    }
+
+    private static IEnumerable<EventFactory> ReadEventFactories(GameProjectDto store, IReadOnlyDictionary<int, EventType> eventTypeDictionary, out IReadOnlyDictionary<int, EventFactory> eventFactoryDictionary)
+    {
+        return store.EventFactories.GetIdDictionaryFromDto(x => new EventFactory
+        {
+            DefaultDuration = x.DefaultTimeSpan,
+            EventType = eventTypeDictionary[x.EventTypeId],
+        }, out eventFactoryDictionary);
+    }
+
+    private static void ReadEventFactoryParameters(GameProjectDto store,
+                                                   IReadOnlyDictionary<int, EventFactory> eventFactoryDictionary,
+                                                   IReadOnlyDictionary<int, PlayerInfo> playersDictionary,
+                                                   IReadOnlyDictionary<int, TeamInfo> teamsDictionary)
+    {
+        var playerDic = store.PlayerEventParameterFactories.ToDictionary(x => x.ParameterId, x => x);
+        var teamDic = store.TeamEventParameterFactories.ToDictionary(x => x.ParameterId, x => x);
+        var textDic = store.TextEventParameterFactories.ToDictionary(x => x.ParameterId, x => x);
+
+        foreach (var x in store.EventParameterFactories)
+        {
+
+            switch (x.ParameterFactoryType)
+            {
+                case EventParameterType.Player:
+                {
+                    var player = playerDic[x.Id];
+                    PlayerEventParameterFactory parameter = new()
+                    {
+                        DefaultPlayer = player.DefaultPlayerId is null ? null : playersDictionary[player.DefaultPlayerId.Value],
+                        DefaultTeam = player.DefaultTeamId is null ? null : teamsDictionary[player.DefaultTeamId.Value],
+                        TeamName = player.TeamName,
+                        Name = x.Name,
+                    };
+
+                    eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
+                    break;
+                }
+                case EventParameterType.Team:
+                {
+                    var team = teamDic[x.Id];
+                    TeamEventParameterFactory parameter = new()
+                    {
+                        DefaultTeam = team.DefaultTeamId is null ? null : teamsDictionary[team.DefaultTeamId.Value],
+                        Name = x.Name,
+                    };
+
+                    eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
+                    break;
+                }
+                case EventParameterType.Text:
+                {
+                    var text = textDic[x.Id];
+                    TextEventParameterFactory parameter = new()
+                    {
+                        DefaultText = text.DefaultText,
+                        Name = x.Name,
+                    };
+
+                    eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
+                    break;
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<EventInfo> ReadEvents(GameProjectDto store, IReadOnlyDictionary<int, EventType> eventTypeDictionary, out IReadOnlyDictionary<int, EventInfo> eventsDictionary)
+    {
+        return store.Events.GetIdDictionaryFromDto(x => new EventInfo(eventTypeDictionary[x.EventTypeId])
+        {
+            StartEventTime = x.StartEventTime,
+            EndEventTime = x.EndEventTime,
+        }, out eventsDictionary);
+    }
+
+    private static void ReadEventsParameters(GameProjectDto store,
+                                             IReadOnlyDictionary<int, EventInfo> eventsDictionary,
+                                             IReadOnlyDictionary<int, PlayerInfo> playersDictionary,
+                                             IReadOnlyDictionary<int, TeamInfo> teamsDictionary)
+    {
+        var playerDic = store.PlayerEventParameters.ToDictionary(x => x.ParameterId, x => x);
+        var teamDic = store.TeamEventParameters.ToDictionary(x => x.ParameterId, x => x);
+        var textDic = store.TextEventParameters.ToDictionary(x => x.ParameterId, x => x);
+
+        foreach (var x in store.EventParameters)
+        {
+            switch (x.ParameterType)
+            {
+                case EventParameterType.Player:
+                {
+                    var player = playerDic[x.Id];
+                    PlayerEventParameter parameter = new(player.TeamName, x.Name)
+                    {
+                        Player = player.PlayerId is null ? null : playersDictionary[player.PlayerId.Value],
+                        Team = player.TeamId is null ? null : teamsDictionary[player.TeamId.Value],
+                    };
+
+                    eventsDictionary[x.EventId].Parameters.Add(parameter);
+                    break;
+                }
+                case EventParameterType.Team:
+                {
+                    var team = teamDic[x.Id];
+                    TeamEventParameter parameter = new(x.Name)
+                    {
+                        Team = team.TeamId is null ? null : teamsDictionary[team.TeamId.Value],
+                    };
+
+                    eventsDictionary[x.EventId].Parameters.Add(parameter);
+                    break;
+                }
+                case EventParameterType.Text:
+                {
+                    var text = textDic[x.Id];
+                    TextEventParameter parameter = new(x.Name)
+                    {
+                        Text = text.Text
+                    };
+
+                    eventsDictionary[x.EventId].Parameters.Add(parameter);
+                    break;
+                }
+            }
+
+        }
+    }
 
     public TeamProjectDto Convert(TeamInfo teamInfo)
     {

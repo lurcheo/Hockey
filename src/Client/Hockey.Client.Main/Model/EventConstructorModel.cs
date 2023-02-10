@@ -12,7 +12,7 @@ namespace Hockey.Client.Main.Model;
 
 internal class EventConstructorModel : ReactiveObject, IEventConstructorModel
 {
-	public ObservableCollection<EventFactory> Factories { get; set; }
+	[Reactive] public ObservableCollection<EventFactory> Factories { get; set; }
 	[Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
 	public IGameStore Store { get; }
 
