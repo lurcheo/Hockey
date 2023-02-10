@@ -31,8 +31,8 @@
                         <MenuItem Header="Открыть">
                             <MenuItem Command="{Binding ReadVideoFromFileCommand}" Header="Видео" />
                             <MenuItem Command="{Binding ReadProjectFromFileCommand}" Header="Проект" />
-                            <MenuItem Header="Домашняя команда" />
-                            <MenuItem Header="Гостевая команда" />
+                            <MenuItem Command="{Binding ReadHomeTeamToFileCommand}" Header="Домашняя команда" />
+                            <MenuItem Command="{Binding ReadGuestTeamToFileCommand}" Header="Гостевая команда" />
                         </MenuItem>
                         <MenuItem Header="Сохранить">
                             <MenuItem Command="{Binding SaveProjectToFileCommand}" Header="Проект" />

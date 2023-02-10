@@ -196,11 +196,6 @@ internal class MainModel : ReactiveObject, IMainModel
         return ProjectService.SaveToFile(fileName, DtoConverter.Convert(GameStore));
     }
 
-    public Task SaveTeamToFile(string fileName, TeamInfo teamInfo)
-    {
-        return ProjectService.SaveToFile(fileName, DtoConverter.Convert(teamInfo));
-    }
-
     public void PlayEvent(EventInfo eventInfo)
     {
         SetPosition((long)(eventInfo.StartEventTime.TotalMilliseconds / MillisecondsPerFrame));
@@ -212,5 +207,25 @@ internal class MainModel : ReactiveObject, IMainModel
             IsPaused = false;
             IsPlayEvent = true;
         }
+    }
+
+    public Task SaveHomeTeamToFile(string fileName)
+    {
+        return ProjectService.SaveToFile(fileName, DtoConverter.Convert(GameStore.HomeTeam));
+    }
+
+    public Task SaveGuestTeamToFile(string fileName)
+    {
+        return ProjectService.SaveToFile(fileName, DtoConverter.Convert(GameStore.GuestTeam));
+    }
+
+    public async Task ReadHomeTeamToFile(string fileName)
+    {
+        GameStore.HomeTeam = DtoConverter.Convert(await ProjectService.GetFromFile<TeamProjectDto>(fileName));
+    }
+
+    public async Task ReadGuestTeamToFile(string fileName)
+    {
+        GameStore.GuestTeam = DtoConverter.Convert(await ProjectService.GetFromFile<TeamProjectDto>(fileName));
     }
 }

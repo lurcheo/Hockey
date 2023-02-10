@@ -185,6 +185,14 @@ internal class DtoConverter : IDtoConverter
         }
     }
 
+    public TeamInfo Convert(TeamProjectDto team)
+    {
+        return new(team.Team.Name,
+                   team.Players
+                       .Select(x => new PlayerInfo(x.Name, x.Number, x.Position, x.Link))
+                       .ToArray());
+    }
+
     public TeamProjectDto Convert(TeamInfo teamInfo)
     {
         return new()

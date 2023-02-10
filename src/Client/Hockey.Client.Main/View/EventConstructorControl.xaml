@@ -57,7 +57,7 @@
                         Header="Наименование" />
                     <DataGridTextColumn
                         Width="*"
-                        Binding="{Binding DefaultTimeSpan}"
+                        Binding="{Binding DefaultDuration}"
                         Header="Длительность по умолчанию" />
                     <DataGridTemplateColumn Width="auto">
                         <DataGridTemplateColumn.CellTemplate>
@@ -80,7 +80,6 @@
         <GroupBox
             Grid.Row="1"
             Padding="10"
-            IsEnabled="{Binding SelectedFactoryCreator.IsCreated, Converter={cv:ReverseBoolConverter}}"
             Style="{StaticResource MaterialDesignCardGroupBox}">
             <GroupBox.Header>
                 <UniformGrid Rows=" 1">
@@ -94,7 +93,7 @@
             </GroupBox.Header>
             <StackPanel>
                 <TextBox md:HintAssist.Hint="Наименование" Text="{Binding SelectedFactoryCreator.EventType.Name}" />
-                <TextBox md:HintAssist.Hint="Длительность по умолчанию" Text="{Binding SelectedFactoryCreator.DefaultTimeSpan, StringFormat=\{0:h\\:mm\\:ss\}}" />
+                <TextBox md:HintAssist.Hint="Длительность по умолчанию" Text="{Binding SelectedFactoryCreator.DefaultDuration, StringFormat=\{0:h\\:mm\\:ss\}}" />
             </StackPanel>
         </GroupBox>
         <GroupBox Grid.Row="2" Style="{StaticResource MaterialDesignCardGroupBox}">

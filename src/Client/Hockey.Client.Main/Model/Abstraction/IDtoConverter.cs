@@ -7,4 +7,5 @@ internal interface IDtoConverter
     void ConvertToExist(IGameStore gameStore, GameProjectDto gameProjectDto);
     GameProjectDto Convert(IGameStore store);
     TeamProjectDto Convert(TeamInfo teamInfo);
+    TeamInfo Convert(TeamProjectDto team);
 }

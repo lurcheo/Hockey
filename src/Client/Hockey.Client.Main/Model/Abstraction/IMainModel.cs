@@ -10,9 +10,6 @@ namespace Hockey.Client.Main.Model.Abstraction;
 
 internal interface IMainModel : IReactiveObject
 {
-    TeamInfo HomeTeam { get; set; }
-    TeamInfo GuestTeam { get; set; }
-
     Mat CurrentFrame { get; set; }
 
     bool IsPaused { get; set; }
@@ -32,6 +29,9 @@ internal interface IMainModel : IReactiveObject
     void SetPosition(long position);
     void PlayEvent(EventInfo eventInfo);
     Task SaveProjectToFile(string fileName);
-    Task SaveTeamToFile(string fileName, TeamInfo teamInfo);
+    Task SaveHomeTeamToFile(string fileName);
+    Task ReadHomeTeamToFile(string fileName);
+    Task SaveGuestTeamToFile(string fileName);
+    Task ReadGuestTeamToFile(string fileName);
     Task ReadProjectFromFile(string fileName, CancellationToken cancellationToken);
 }
