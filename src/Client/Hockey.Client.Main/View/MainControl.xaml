@@ -30,7 +30,7 @@
                     <MenuItem Header="Файл">
                         <MenuItem Header="Открыть">
                             <MenuItem Command="{Binding ReadVideoFromFileCommand}" Header="Видео" />
-                            <MenuItem Header="Проект" />
+                            <MenuItem Command="{Binding ReadProjectFromFileCommand}" Header="Проект" />
                             <MenuItem Header="Домашняя команда" />
                             <MenuItem Header="Гостевая команда" />
                         </MenuItem>
@@ -110,8 +110,7 @@
                 </md:DrawerHost.RightDrawerContent>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="55.623" />
-                        <ColumnDefinition Width="152.377" />
+                        <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
@@ -120,7 +119,7 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <ToggleButton
-                        Margin="15,15,0,0"
+                        Margin="15"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         AutomationProperties.Name="HamburgerToggleButton"
@@ -128,8 +127,8 @@
                         Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                     <ToggleButton
                         Grid.Row="0"
-                        Grid.Column="3"
-                        Margin="0,15,15,0"
+                        Grid.Column="2"
+                        Margin="15"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         AutomationProperties.Name="HamburgerToggleButton"
@@ -141,17 +140,15 @@
                         </ToggleButton.RenderTransform>
                     </ToggleButton>
                     <Image
-                        Grid.Row="1"
-                        Grid.Column="1"
+                        Grid.Row="0"
+                        Grid.Column="0"
                         Grid.ColumnSpan="3"
-                        Margin="9,0,65,60"
+                        Margin="65,0,65,0"
                         VerticalAlignment="Bottom"
                         Source="{Binding Frame}" />
                     <TextBlock
                         Grid.Row="1"
-                        Grid.Column="2"
-                        Grid.ColumnSpan="2"
-                        Margin="0,0,580,0"
+                        Grid.Column="1"
                         VerticalAlignment="Center"
                         DataContext="{Binding Model}">
                         <Run Text="{Binding CurrentTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
@@ -161,7 +158,6 @@
                     <UniformGrid
                         Grid.Row="1"
                         Grid.Column="0"
-                        Grid.ColumnSpan="2"
                         IsEnabled="{Binding Model.IsPlayEvent, Converter={cv:ReverseBoolConverter}}"
                         Rows="1">
                         <Button Content="{md:PackIcon Kind=ArrowLeftBoldCircleOutline}" Style="{StaticResource IconButton}" />
@@ -187,7 +183,7 @@
                     </UniformGrid>
                     <Slider
                         Grid.Row="1"
-                        Grid.Column="3"
+                        Grid.Column="2"
                         Margin="10,20,10,20"
                         IsEnabled="{Binding Model.IsPlayEvent, Converter={cv:ReverseBoolConverter}}"
                         Maximum="{Binding Model.FramesCount}"

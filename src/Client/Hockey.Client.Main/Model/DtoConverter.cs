@@ -10,6 +10,40 @@ namespace Hockey.Client.Main.Model;
 
 internal class DtoConverter : IDtoConverter
 {
+    public void ConvertToExist(IGameStore store, GameProjectDto storeDto)
+    {
+        ReadTeams(storeDto, out var teamDictionary, out var guestTeam, out var homeTeam);
+        ReadPlayers(storeDto, teamDictionary, out var playerDictionary);
+
+        store.GuestTeam = guestTeam;
+        store.HomeTeam = homeTeam;
+    }
+
+    private static void ReadTeams(GameProjectDto store,
+                                  out IReadOnlyDictionary<int, TeamInfo> teamDictionary,
+                                  out TeamInfo guestTeam,
+                                  out TeamInfo homeTeam)
+    {
+        store.Teams.GetIdDictionaryFromDto(x => new TeamInfo(x.Name), out var teamDic);
+        teamDictionary = teamDic;
+        guestTeam = teamDic[store.GuestTeamId];
+        homeTeam = teamDic[store.HomeTeamId];
+    }
+
+    private static void ReadPlayers(GameProjectDto store,
+                                   IReadOnlyDictionary<int, TeamInfo> teamDictionary,
+                                   out IReadOnlyDictionary<int, PlayerInfo> playerDictionary)
+
+    {
+        store.Players.GetIdDictionaryFromDto(x =>
+         {
+             PlayerInfo player = new(x.Name, x.Number, x.Position, x.Link);
+             teamDictionary[x.TeamId].Players.Add(player);
+             return player;
+         }, out playerDictionary);
+    }
+
+
     public TeamProjectDto Convert(TeamInfo teamInfo)
     {
         return new()
@@ -31,6 +65,7 @@ internal class DtoConverter : IDtoConverter
         };
     }
 
+    #region Convert to Dto
     public GameProjectDto Convert(IGameStore store)
     {
         var teamsDto = GetTeamsDto(store,
@@ -376,4 +411,5 @@ internal class DtoConverter : IDtoConverter
             Text = x.Text
         }).ToArray();
     }
+    #endregion
 }

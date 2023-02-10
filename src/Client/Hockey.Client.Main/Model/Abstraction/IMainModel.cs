@@ -33,4 +33,5 @@ internal interface IMainModel : IReactiveObject
     void PlayEvent(EventInfo eventInfo);
     Task SaveProjectToFile(string fileName);
     Task SaveTeamToFile(string fileName, TeamInfo teamInfo);
+    Task ReadProjectFromFile(string fileName, CancellationToken cancellationToken);
 }

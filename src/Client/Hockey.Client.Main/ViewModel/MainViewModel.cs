@@ -30,7 +30,10 @@ internal class MainViewModel : ReactiveObject
     public ICommand SaveProjectToFileCommand { get; }
     public ICommand SaveHomeTeamToFileCommand { get; }
     public ICommand SaveGuestTeamToFileCommand { get; }
+
     public ICommand ReadVideoFromFileCommand { get; }
+    public ICommand ReadProjectFromFileCommand { get; }
+
     public ICommand ReversePauseCommand { get; }
 
     public ICommand UserClickedCommand { get; }
@@ -59,6 +62,26 @@ internal class MainViewModel : ReactiveObject
         SaveGuestTeamToFileCommand = ReactiveCommand.CreateFromTask
         (
             () => SaveTeam(Model.GuestTeam)
+        );
+
+        ReadProjectFromFileCommand = ReactiveCommand.CreateFromTask
+        (
+            async () =>
+            {
+                OpenFileDialog openFileDialog = new();
+
+                string ext = "hapj";
+                openFileDialog.Filter = "Проект аналитики хоккейного матча".ConcatExtensions(ext);
+
+                if (openFileDialog.ShowDialog() == false)
+                {
+                    return;
+                }
+
+                LastTokenSource?.Cancel();
+                LastTokenSource = new();
+                await Model.ReadProjectFromFile(openFileDialog.FileName, LastTokenSource.Token);
+            }
         );
 
         SaveProjectToFileCommand = ReactiveCommand.CreateFromTask

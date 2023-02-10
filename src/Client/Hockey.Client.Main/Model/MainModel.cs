@@ -4,6 +4,7 @@ using Hockey.Client.Main.Events;
 using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
+using Hockey.Client.Shared.Dto;
 using Hockey.Client.Shared.Extensions;
 using OpenCvSharp;
 using Prism.Events;
@@ -108,6 +109,19 @@ internal class MainModel : ReactiveObject, IMainModel
                 CurrentFrame = info.Frame;
             });
         }
+    }
+
+    public async Task ReadProjectFromFile(string fileName, CancellationToken cancellationToken)
+    {
+        var project = await ProjectService.GetFromFile<GameProjectDto>(fileName);
+        DtoConverter.ConvertToExist(GameStore, project);
+
+        if (string.IsNullOrEmpty(GameStore.VideoPath))
+        {
+            return;
+        }
+
+        await ReadVideoFromFile(GameStore.VideoPath, cancellationToken);
     }
 
 
