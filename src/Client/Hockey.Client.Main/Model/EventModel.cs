@@ -57,7 +57,7 @@ internal class EventModel : ReactiveObject, IEventModel
         var eventInfo = factory.Create();
 
         eventInfo.StartEventTime = Store.CurrentTime;
-        eventInfo.EndEventTime = eventInfo.StartEventTime + eventInfo.DefaultDuration;
+        eventInfo.EndEventTime = eventInfo.StartEventTime + factory.DefaultDuration;
 
         return eventInfo;
     }

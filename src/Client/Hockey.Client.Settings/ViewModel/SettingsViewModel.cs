@@ -17,7 +17,5 @@ internal class SettingsViewModel : ReactiveObject
 		Model = model;
 
 		ReverseThemeCommand = ReactiveCommand.Create(() => Model.IsDark = !Model.IsDark);
-		ReverseWindowStateCommand = ReactiveCommand.Create(() => Model.IsMaximized = !Model.IsMaximized);
-		CloseCommand = ReactiveCommand.Create(Model.Close);
 	}
 }

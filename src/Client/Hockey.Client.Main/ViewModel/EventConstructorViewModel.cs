@@ -48,7 +48,7 @@ internal class EventConstructorViewModel : ReactiveObject
                 EventFactory newFactory = new()
                 {
                     EventType = new("Новое событие"),
-                    DefaultTimeSpan = TimeSpan.FromSeconds(10),
+                    DefaultDuration = TimeSpan.FromSeconds(10),
                 };
 
                 Model.Factories.Add(newFactory);

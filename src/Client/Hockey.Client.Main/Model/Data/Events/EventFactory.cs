@@ -10,7 +10,7 @@ namespace Hockey.Client.Main.Model.Data.Events;
 internal class EventFactory : ReactiveObject
 {
     [Reactive] public EventType EventType { get; set; }
-    [Reactive] public TimeSpan DefaultTimeSpan { get; set; }
+    [Reactive] public TimeSpan DefaultDuration { get; set; }
 
     public ObservableCollection<EventParameterFactory> ParameterFactories { get; }
 
@@ -27,7 +27,6 @@ internal class EventFactory : ReactiveObject
     public EventInfo Create()
     {
         return new EventInfo(EventType,
-                             DefaultTimeSpan,
                              ParameterFactories.Select
                              (
                                  x => x switch

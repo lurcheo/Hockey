@@ -44,11 +44,13 @@ internal class MainModel : ReactiveObject, IMainModel
     private IVideoReader videoReader;
 
 
-    public MainModel(IVideoService videoService, IGameStore gameStore, IEventAggregator eventAggregator)
+    public MainModel(IVideoService videoService, IGameStore gameStore, IEventAggregator eventAggregator, IDtoConverter dtoConverter)
     {
         VideoService = videoService;
         GameStore = gameStore;
         EventAggregator = eventAggregator;
+
+        dtoConverter.Convert(gameStore);
 
         this.WhenAnyValue(x => x.FrameNumber)
             .Do(x => CurrentTime = TimeSpan.FromMilliseconds(x * MillisecondsPerFrame))

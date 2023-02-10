@@ -27,13 +27,13 @@ public class MainModule : IModule
 
     public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        containerRegistry.RegisterSingleton<IMainModel, MainModel>();
-        containerRegistry.RegisterSingleton<IGameStoreProvider, GameStoreProvider>();
+        containerRegistry.RegisterSingleton<IGameStoreProvider, GameStoreProvider>()
+                         .RegisterSingleton<IGameStore>(s => s.Resolve<IGameStoreProvider>()
+                                                              .CreateDefault())
+                         .RegisterSingleton<IDtoConverter, DtoConverter>();
 
-        containerRegistry.RegisterSingleton<IGameStore>(s => s.Resolve<IGameStoreProvider>()
-                                                              .CreateDefault());
-
-        containerRegistry.RegisterSingleton<IHomeTeamModel, HomeTeamModel>()
+        containerRegistry.RegisterSingleton<IMainModel, MainModel>()
+                         .RegisterSingleton<IHomeTeamModel, HomeTeamModel>()
                          .RegisterSingleton<IGuestTeamModel, GuestTeamModel>()
                          .RegisterSingleton<IEventModel, EventModel>()
                          .RegisterSingleton<IEventConstructorModel, EventConstructorModel>();

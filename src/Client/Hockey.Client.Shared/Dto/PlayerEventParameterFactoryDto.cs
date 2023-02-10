@@ -1,6 +1,6 @@
-﻿namespace Hockey.Client.Main.Dto;
+﻿namespace Hockey.Client.Shared.Dto;
 
-internal class PlayerEventParameterFactoryDto : BaseDto
+public class PlayerEventParameterFactoryDto : BaseDto
 {
     public int ParameterId { get; set; }
     public string TeamName { get; set; }

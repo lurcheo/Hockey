@@ -20,14 +20,5 @@ internal class SettingsModel : ReactiveObject, ISettingsModel
         this.WhenAnyValue(x => x.IsDark)
             .Subscribe(AppHelper.ChangeTheme)
             .Cache();
-
-        this.WhenAnyValue(x => x.IsMaximized)
-            .Subscribe(AppHelper.ChangeScreen)
-            .Cache();
-    }
-
-    public void Close()
-    {
-        AppHelper.Close();
     }
 }

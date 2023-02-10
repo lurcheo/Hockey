@@ -1,5 +1,4 @@
-﻿using Hockey.Client.Main.Dto;
-using Hockey.Client.Main.Model.Abstraction;
+﻿using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
 using Hockey.Client.Shared.Data;
@@ -19,8 +18,6 @@ internal class GameStoreProvider : IGameStoreProvider
                                   factories,
                                   GetDefaultHomeTeam(),
                                   GetDefaultGuestTeam());
-
-        store.Save();
 
         return store;
     }
@@ -46,7 +43,7 @@ internal class GameStoreProvider : IGameStoreProvider
             )
             {
                 EventType = new("Гол"),
-                DefaultTimeSpan = TimeSpan.FromSeconds(10),
+                DefaultDuration = TimeSpan.FromSeconds(10),
             },
             new EventFactory
             (
@@ -70,7 +67,7 @@ internal class GameStoreProvider : IGameStoreProvider
             )
             {
                 EventType = new("Толчок"),
-                DefaultTimeSpan = TimeSpan.FromSeconds(10),
+                DefaultDuration = TimeSpan.FromSeconds(10),
             },
             new EventFactory
             (
@@ -88,7 +85,7 @@ internal class GameStoreProvider : IGameStoreProvider
             )
             {
                 EventType = new("Игра в меньшинстве"),
-                DefaultTimeSpan = TimeSpan.FromSeconds(10),
+                DefaultDuration = TimeSpan.FromSeconds(10),
             },
             new EventFactory
             (
@@ -106,7 +103,7 @@ internal class GameStoreProvider : IGameStoreProvider
             )
             {
                 EventType = new("Игра в большинстве"),
-                DefaultTimeSpan = TimeSpan.FromSeconds(10),
+                DefaultDuration = TimeSpan.FromSeconds(10),
             }
         };
     }

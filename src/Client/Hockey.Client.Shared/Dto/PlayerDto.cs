@@ -1,8 +1,8 @@
 ﻿using Hockey.Client.Shared.Data;
 
-namespace Hockey.Client.Main.Dto;
+namespace Hockey.Client.Shared.Dto;
 
-internal class PlayerDto : BaseDto
+public class PlayerDto : BaseDto
 {
     public PlayerPosition Position { get; set; }
     public string Name { get; set; }
