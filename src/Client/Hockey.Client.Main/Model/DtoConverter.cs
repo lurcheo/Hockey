@@ -3,9 +3,7 @@ using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
 using Hockey.Client.Shared.Dto;
 using Hockey.Client.Shared.Extensions;
-using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Hockey.Client.Main.Model;
@@ -46,6 +44,26 @@ internal class DtoConverter : IDtoConverter
 
         var textEventParameterFactoriesDto = GetTextEventParameterFactoriesDto(allEventParameterFactories,
                                                                                eventParameterFactoriesDictionary);
+        var eventsDto = GetEventsDto(store,
+                                     eventTypesDictionary,
+                                     out var eventsDictionary);
+
+        var eventParametersDto = GetEventParametersDto(store,
+                                                       eventsDictionary,
+                                                       out var eventParametersDictionary,
+                                                       out var allEventParameters);
+
+        var playerEventParametersDto = GetPlayerEventParametersDto(allEventParameters,
+                                                                   eventParametersDictionary,
+                                                                   teamDictionary,
+                                                                   playersDictionary);
+
+        var teamEventParametersDto = GetTeamEventParametersDto(allEventParameters,
+                                                               eventParametersDictionary,
+                                                               teamDictionary);
+
+        var textEventParametersDto = GetTextEventParametersDto(allEventParameters,
+                                                               eventParametersDictionary);
 
 
         GameProjectDto gameProject = new()
@@ -59,10 +77,13 @@ internal class DtoConverter : IDtoConverter
             EventTypes = eventTypesDto,
             PlayerEventParameterFactories = playerEventParameterFactoriesDto,
             TeamEventParameterFactories = teamEventParameterFactoriesDto,
-            TextEventParameterFactories = textEventParameterFactoriesDto
+            TextEventParameterFactories = textEventParameterFactoriesDto,
+            Events = eventsDto,
+            EventParameters = eventParametersDto,
+            PlayerEventParameters = playerEventParametersDto,
+            TeamEventParameters = teamEventParametersDto,
+            TextEventParameters = textEventParametersDto
         };
-
-        File.WriteAllText("test.hjson", JsonConvert.SerializeObject(gameProject, Formatting.Indented));
 
         return gameProject;
     }
@@ -112,7 +133,8 @@ internal class DtoConverter : IDtoConverter
         }).ToArray();
     }
 
-    private static EventTypeDto[] GetTypesDto(IGameStore store, out IReadOnlyDictionary<EventType, int> eventTypesDictionary)
+    private static EventTypeDto[] GetTypesDto(IGameStore store,
+                                              out IReadOnlyDictionary<EventType, int> eventTypesDictionary)
     {
         var types = store.EventFactories
                          .Select(x => x.EventType)
@@ -168,17 +190,17 @@ internal class DtoConverter : IDtoConverter
             Name = x.eventParameterFactory.Name,
             ParameterFactoryType = x.eventParameterFactory switch
             {
-                PlayerEventParameterFactory => EventParameterFactoryType.Player,
-                TeamEventParameterFactory => EventParameterFactoryType.Team,
-                TextEventParameterFactory => EventParameterFactoryType.Text,
+                PlayerEventParameterFactory => EventParameterType.Player,
+                TeamEventParameterFactory => EventParameterType.Team,
+                TextEventParameterFactory => EventParameterType.Text,
             }
         }).ToArray();
     }
 
     private static PlayerEventParameterFactoryDto[] GetPlayerEventParameterFactoriesDto(IEnumerable<EventParameterFactory> allEventParameterFactories,
-                                                                                  IReadOnlyDictionary<EventParameterFactory, int> eventParameterFactoriesDictionary,
-                                                                                  IReadOnlyDictionary<TeamInfo, int> teamDictionary,
-                                                                                  IReadOnlyDictionary<PlayerInfo, int> playersDictionary)
+                                                                                        IReadOnlyDictionary<EventParameterFactory, int> eventParameterFactoriesDictionary,
+                                                                                        IReadOnlyDictionary<TeamInfo, int> teamDictionary,
+                                                                                        IReadOnlyDictionary<PlayerInfo, int> playersDictionary)
     {
         var playerEventFactoryParameters = allEventParameterFactories.Select(x => x as PlayerEventParameterFactory)
                                                                    .Where(x => x != null)
@@ -196,8 +218,8 @@ internal class DtoConverter : IDtoConverter
     }
 
     private static TeamEventParameterFactoryDto[] GetTeamEventParameterFactoriesDto(IEnumerable<EventParameterFactory> allEventParameterFactories,
-                                                                                 IReadOnlyDictionary<EventParameterFactory, int> eventParameterFactoriesDictionary,
-                                                                                 IReadOnlyDictionary<TeamInfo, int> teamDictionary)
+                                                                                    IReadOnlyDictionary<EventParameterFactory, int> eventParameterFactoriesDictionary,
+                                                                                    IReadOnlyDictionary<TeamInfo, int> teamDictionary)
     {
         var teamEventFactoryParameters = allEventParameterFactories.Select(x => x as TeamEventParameterFactory)
                                                                   .Where(x => x != null)
@@ -213,7 +235,7 @@ internal class DtoConverter : IDtoConverter
     }
 
     private static TextEventParameterFactoryDto[] GetTextEventParameterFactoriesDto(IEnumerable<EventParameterFactory> allEventParameterFactories,
-                                                                                 IReadOnlyDictionary<EventParameterFactory, int> eventParameterFactoriesDictionary)
+                                                                                    IReadOnlyDictionary<EventParameterFactory, int> eventParameterFactoriesDictionary)
     {
         var textEventFactoryParameters = allEventParameterFactories.Select(x => x as TextEventParameterFactory)
                                                                  .Where(x => x != null)
@@ -224,6 +246,112 @@ internal class DtoConverter : IDtoConverter
             Id = textEventFactoryParametersDic[x],
             DefaultText = x.DefaultText,
             ParameterId = eventParameterFactoriesDictionary[x],
+        }).ToArray();
+    }
+
+    private static EventDto[] GetEventsDto(IGameStore store,
+                                           IReadOnlyDictionary<EventType, int> eventTypesDictionary,
+                                           out IReadOnlyDictionary<EventInfo, int> eventsDictionary)
+    {
+        var events = store.Events.ToArray();
+
+        var eventsDic = events.GetIdDictionary();
+        eventsDictionary = eventsDic;
+
+        return events.Select(x => new EventDto
+        {
+            Id = eventsDic[x],
+            EndEventTime = x.EndEventTime,
+            StartEventTime = x.StartEventTime,
+            EventTypeId = eventTypesDictionary[x.EventType]
+        }).ToArray();
+    }
+
+    private static EventParameterDto[] GetEventParametersDto(IGameStore store,
+                                                             IReadOnlyDictionary<EventInfo, int> eventsDictionary,
+                                                             out IReadOnlyDictionary<EventParameter, int> eventParametersDictionary,
+                                                             out IEnumerable<EventParameter> allEventParameters)
+    {
+        var events = store.Events.ToArray();
+        var parameters = events.SelectMany
+        (
+            x => x.Parameters
+                  .Select(p => (@event: x, parameter: p))
+        ).ToArray();
+
+        var eventParametersDic = parameters.Select(x => x.parameter)
+                                                              .GetIdDictionary();
+        eventParametersDictionary = eventParametersDic;
+        allEventParameters = parameters.Select(x => x.parameter).ToArray();
+
+        return parameters.Select(x => new EventParameterDto
+        {
+            Id = eventParametersDic[x.parameter],
+            Name = x.parameter.Name,
+            EventId = eventsDictionary[x.@event],
+            ParameterType = x.parameter switch
+            {
+                PlayerEventParameter => EventParameterType.Player,
+                TeamEventParameter => EventParameterType.Team,
+                TextEventParameter => EventParameterType.Text,
+            }
+        }).ToArray();
+    }
+
+    private static PlayerEventParameterDto[] GetPlayerEventParametersDto(IEnumerable<EventParameter> allEventParameters,
+                                                                                  IReadOnlyDictionary<EventParameter, int> eventParametersDictionary,
+                                                                                  IReadOnlyDictionary<TeamInfo, int> teamDictionary,
+                                                                                  IReadOnlyDictionary<PlayerInfo, int> playersDictionary)
+    {
+        var playerEventParameters = allEventParameters.Select(x => x as PlayerEventParameter)
+                                                      .Where(x => x != null)
+                                                      .ToArray();
+
+        var playerEventParametersDic = playerEventParameters.GetIdDictionary();
+
+        return playerEventParameters.Select(x => new PlayerEventParameterDto
+        {
+            Id = playerEventParametersDic[x],
+            TeamName = x.TeamName,
+            PlayerId = x.Player is not null ? playersDictionary[x.Player] : null,
+            TeamId = x.Team is not null ? teamDictionary[x.Team] : null,
+            ParameterId = eventParametersDictionary[x],
+        }).ToArray();
+    }
+
+    private static TeamEventParameterDto[] GetTeamEventParametersDto(IEnumerable<EventParameter> allEventParameters,
+                                                                     IReadOnlyDictionary<EventParameter, int> eventParametersDictionary,
+                                                                     IReadOnlyDictionary<TeamInfo, int> teamDictionary)
+    {
+        var teamEventParameters = allEventParameters.Select(x => x as TeamEventParameter)
+                                                    .Where(x => x != null)
+                                                    .ToArray();
+
+        var teamEventParametersDic = teamEventParameters.GetIdDictionary();
+
+        return teamEventParameters.Select(x => new TeamEventParameterDto
+        {
+            Id = teamEventParametersDic[x],
+            TeamId = x.Team is not null ? teamDictionary[x.Team] : null,
+            ParameterId = eventParametersDictionary[x],
+        }).ToArray();
+    }
+
+    private static TextEventParameterDto[] GetTextEventParametersDto(IEnumerable<EventParameter> allEventParameters,
+                                                                     IReadOnlyDictionary<EventParameter, int> eventParametersDictionary)
+    {
+        var textEventParameters = allEventParameters.Select(x => x as TextEventParameter)
+                                                    .Where(x => x != null)
+                                                    .ToArray();
+
+
+        var textEventParametersDic = textEventParameters.GetIdDictionary();
+
+        return textEventParameters.Select(x => new TextEventParameterDto
+        {
+            Id = textEventParametersDic[x],
+            ParameterId = eventParametersDictionary[x],
+            Text = x.Text
         }).ToArray();
     }
 }

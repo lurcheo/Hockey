@@ -13,4 +13,9 @@ public class GameProjectDto
     public PlayerEventParameterFactoryDto[] PlayerEventParameterFactories { get; set; }
     public TeamEventParameterFactoryDto[] TeamEventParameterFactories { get; set; }
     public TextEventParameterFactoryDto[] TextEventParameterFactories { get; set; }
+    public EventDto[] Events { get; set; }
+    public EventParameterDto[] EventParameters { get; set; }
+    public PlayerEventParameterDto[] PlayerEventParameters { get; set; }
+    public TeamEventParameterDto[] TeamEventParameters { get; set; }
+    public TextEventParameterDto[] TextEventParameters { get; set; }
 }

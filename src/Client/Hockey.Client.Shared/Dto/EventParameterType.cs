@@ -1,6 +1,6 @@
 ﻿namespace Hockey.Client.Shared.Dto;
 
-public enum EventParameterFactoryType
+public enum EventParameterType
 {
     Player,
     Team,
