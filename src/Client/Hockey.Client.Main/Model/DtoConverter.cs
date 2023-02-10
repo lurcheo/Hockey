@@ -10,6 +10,27 @@ namespace Hockey.Client.Main.Model;
 
 internal class DtoConverter : IDtoConverter
 {
+    public TeamProjectDto Convert(TeamInfo teamInfo)
+    {
+        return new()
+        {
+            Team = new TeamDto
+            {
+                Id = -1,
+                Name = teamInfo.Name,
+            },
+            Players = teamInfo.Players.Select(x => new PlayerDto
+            {
+                Id = -1,
+                Link = x.Link,
+                Name = x.Name,
+                Number = x.Number,
+                Position = x.Position,
+                TeamId = -1
+            }).ToArray()
+        };
+    }
+
     public GameProjectDto Convert(IGameStore store)
     {
         var teamsDto = GetTeamsDto(store,
@@ -70,6 +91,7 @@ internal class DtoConverter : IDtoConverter
         {
             HomeTeamId = homeTeamId,
             GuestTeamId = guestTeamId,
+            VideoPath = store.VideoPath,
             Teams = teamsDto,
             Players = playersDto,
             EventFactories = eventFactoriesDto,

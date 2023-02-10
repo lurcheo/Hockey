@@ -13,4 +13,5 @@ internal interface IGameStore : IReactiveObject
     TeamInfo HomeTeam { get; set; }
     TeamInfo GuestTeam { get; set; }
     TimeSpan CurrentTime { get; set; }
+    string VideoPath { get; set; }
 }

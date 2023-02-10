@@ -24,7 +24,8 @@ internal class MainModel : ReactiveObject, IMainModel
     public IVideoService VideoService { get; }
     public IGameStore GameStore { get; }
     public IEventAggregator EventAggregator { get; }
-
+    public IDtoConverter DtoConverter { get; }
+    public IFileService ProjectService { get; }
     [Reactive] public Mat CurrentFrame { get; set; }
 
     [Reactive] public bool IsPaused { get; set; }
@@ -40,17 +41,31 @@ internal class MainModel : ReactiveObject, IMainModel
     [Reactive] public TimeSpan EndTime { get; set; }
 
     [Reactive] public PlayingState PlayingState { get; set; }
+    [Reactive] public TeamInfo HomeTeam { get; set; }
+    [Reactive] public TeamInfo GuestTeam { get; set; }
 
     private IVideoReader videoReader;
 
 
-    public MainModel(IVideoService videoService, IGameStore gameStore, IEventAggregator eventAggregator, IDtoConverter dtoConverter)
+    public MainModel(IVideoService videoService,
+                     IGameStore gameStore,
+                     IEventAggregator eventAggregator,
+                     IDtoConverter dtoConverter,
+                     IFileService projectService)
     {
         VideoService = videoService;
         GameStore = gameStore;
         EventAggregator = eventAggregator;
+        DtoConverter = dtoConverter;
+        ProjectService = projectService;
 
-        dtoConverter.Convert(gameStore);
+        GameStore.WhenAnyValue(x => x.GuestTeam)
+                 .Subscribe(x => GuestTeam = x)
+                 .Cache();
+
+        GameStore.WhenAnyValue(x => x.HomeTeam)
+                 .Subscribe(x => HomeTeam = x)
+                 .Cache();
 
         this.WhenAnyValue(x => x.FrameNumber)
             .Do(x => CurrentTime = TimeSpan.FromMilliseconds(x * MillisecondsPerFrame))
@@ -106,6 +121,7 @@ internal class MainModel : ReactiveObject, IMainModel
 
                 videoReader = VideoService.ReadVideoFromFile(fileName);
 
+                GameStore.VideoPath = fileName;
                 PlayingState = PlayingState.PlayVideo;
                 MillisecondsPerFrame = videoReader.MillisecondsPerFrame;
                 FramesCount = videoReader.FramesCount;
@@ -159,6 +175,16 @@ internal class MainModel : ReactiveObject, IMainModel
                 }
             }
         );
+    }
+
+    public Task SaveProjectToFile(string fileName)
+    {
+        return ProjectService.SaveToFile(fileName, DtoConverter.Convert(GameStore));
+    }
+
+    public Task SaveTeamToFile(string fileName, TeamInfo teamInfo)
+    {
+        return ProjectService.SaveToFile(fileName, DtoConverter.Convert(teamInfo));
     }
 
     public void PlayEvent(EventInfo eventInfo)

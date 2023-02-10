@@ -9,6 +9,7 @@ public static class BusinessLayerExtensions
     public static IContainerRegistry AddBusinessLayer(this IContainerRegistry containerRegistry)
     {
         containerRegistry.RegisterSingleton<IVideoService, VideoService>();
+        containerRegistry.RegisterSingleton<IFileService, JsonFileService>();
         containerRegistry.RegisterSingleton<IAppHelper, AppHelper>();
 
         return containerRegistry;

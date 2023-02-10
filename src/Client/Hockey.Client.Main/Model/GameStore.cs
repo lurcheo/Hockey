@@ -16,6 +16,7 @@ internal class GameStore : ReactiveObject, IGameStore
 
     [Reactive] public TeamInfo HomeTeam { get; set; }
     [Reactive] public TeamInfo GuestTeam { get; set; }
+    [Reactive] public string VideoPath { get; set; }
     [Reactive] public TimeSpan CurrentTime { get; set; }
 
     public GameStore(IEnumerable<EventInfo> events, IEnumerable<EventFactory> factories, TeamInfo homeTeam, TeamInfo guestTeam)

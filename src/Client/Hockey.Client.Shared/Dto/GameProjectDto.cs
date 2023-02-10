@@ -4,6 +4,7 @@ public class GameProjectDto
 {
     public int GuestTeamId { get; set; }
     public int HomeTeamId { get; set; }
+    public string VideoPath { get; set; }
 
     public TeamDto[] Teams { get; set; }
     public PlayerDto[] Players { get; set; }
