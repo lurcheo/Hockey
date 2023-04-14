@@ -48,7 +48,7 @@ internal class DtoConverter : IDtoConverter
     {
         store.Players.GetIdDictionaryFromDto(x =>
          {
-             PlayerInfo player = new(x.Name, x.Number, x.Position, x.Link);
+             PlayerInfo player = new(x.Name, x.Number);
              teamDictionary[x.TeamId].Players.Add(player);
              return player;
          }, out playerDictionary);
@@ -189,7 +189,7 @@ internal class DtoConverter : IDtoConverter
     {
         return new(team.Team.Name,
                    team.Players
-                       .Select(x => new PlayerInfo(x.Name, x.Number, x.Position, x.Link))
+                       .Select(x => new PlayerInfo(x.Name, x.Number))
                        .ToArray());
     }
 
@@ -205,10 +205,8 @@ internal class DtoConverter : IDtoConverter
             Players = teamInfo.Players.Select(x => new PlayerDto
             {
                 Id = -1,
-                Link = x.Link,
                 Name = x.Name,
                 Number = x.Number,
-                Position = x.Position,
                 TeamId = -1
             }).ToArray()
         };
@@ -331,10 +329,8 @@ internal class DtoConverter : IDtoConverter
         return players.Select(x => new PlayerDto
         {
             Id = playersDic[x.player],
-            Link = x.player.Link,
             Name = x.player.Name,
             Number = x.player.Number,
-            Position = x.player.Position,
             TeamId = teamDictionary[x.team]
         }).ToArray();
     }

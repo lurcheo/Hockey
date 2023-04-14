@@ -1,7 +1,6 @@
 ﻿using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
-using Hockey.Client.Shared.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -716,15 +715,27 @@ internal class GameStoreProvider : IGameStoreProvider
 
     private static TeamInfo GetDefaultHomeTeam()
     {
-        return new("Команда хозяев", Enumerable.Range(1, 23)
-                                               .Select(x => new PlayerInfo($"Игрок хозяев {x}", x, (PlayerPosition)(x % 4), x / 6 + 1))
-                                               .ToArray());
+        TeamInfo team = new("Команда хозяев",
+                        Enumerable.Range(1, 40)
+                                  .Select(x => new PlayerInfo($"Игрок хозяев {x}", x))
+                                  .ToArray());
+
+        team.Squads.Add(new("Атака"));
+        team.Squads.Add(new("Защита"));
+
+        return team;
     }
 
     private static TeamInfo GetDefaultGuestTeam()
     {
-        return new("Команда гостей", Enumerable.Range(1, 23)
-                                               .Select(x => new PlayerInfo($"Игрок гостей {x}", x, (PlayerPosition)(x % 4), x / 6 + 1))
-                                               .ToArray());
+        TeamInfo team = new("Команда гостей",
+                        Enumerable.Range(1, 40)
+                                  .Select(x => new PlayerInfo($"Игрок гостей {x}", x))
+                                  .ToArray());
+
+        team.Squads.Add(new("Атака"));
+        team.Squads.Add(new("Защита"));
+
+        return team;
     }
 }
