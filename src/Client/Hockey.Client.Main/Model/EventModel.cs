@@ -1,4 +1,6 @@
-﻿using Hockey.Client.Main.Events;
+﻿using Hockey.Client.BusinessLayer.Abstraction;
+using Hockey.Client.BusinessLayer.Data;
+using Hockey.Client.Main.Events;
 using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
@@ -9,7 +11,9 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Hockey.Client.Main.Model;
 
@@ -19,14 +23,18 @@ internal class EventModel : ReactiveObject, IEventModel
     [Reactive] public ObservableCollection<EventFactory> EventFactories { get; set; }
     [Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
 
+    [Reactive] public int VideoSavingProgress { get; set; } = 0;
+
     public IGameStore Store { get; }
+    public IVideoService VideoService { get; }
     public IEventAggregator EventAggregator { get; }
 
     private IDisposable eventAddedDisposable;
 
-    public EventModel(IGameStore store, IEventAggregator eventAggregator)
+    public EventModel(IGameStore store, IVideoService videoService, IEventAggregator eventAggregator)
     {
         Store = store;
+        VideoService = videoService;
         EventAggregator = eventAggregator;
 
         Store.WhenAnyValue(x => x.Events)
@@ -66,5 +74,18 @@ internal class EventModel : ReactiveObject, IEventModel
     {
         EventAggregator.GetEvent<PlayEvent>()
                        .Publish(eventInfo);
+    }
+
+    public async Task WriteVideoFromEvents(string filePath)
+    {
+        VideoSavingProgress = 0;
+
+        var moments = Events.Select(x => new GameMoment(x.StartEventTime,
+                                                        x.EndEventTime))
+                            .ToList();
+
+        await VideoService.WriteMomentToVideoFile(Store.VideoPath, filePath, moments, x => VideoSavingProgress = (int)(x * 100));
+
+        VideoSavingProgress = 0;
     }
 }

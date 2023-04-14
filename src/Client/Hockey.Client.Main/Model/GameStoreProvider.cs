@@ -720,9 +720,6 @@ internal class GameStoreProvider : IGameStoreProvider
                                   .Select(x => new PlayerInfo($"Игрок хозяев {x}", x))
                                   .ToArray());
 
-        team.Squads.Add(new("Атака"));
-        team.Squads.Add(new("Защита"));
-
         return team;
     }
 
@@ -732,9 +729,6 @@ internal class GameStoreProvider : IGameStoreProvider
                         Enumerable.Range(1, 40)
                                   .Select(x => new PlayerInfo($"Игрок гостей {x}", x))
                                   .ToArray());
-
-        team.Squads.Add(new("Атака"));
-        team.Squads.Add(new("Защита"));
 
         return team;
     }

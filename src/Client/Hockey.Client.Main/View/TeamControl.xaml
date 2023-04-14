@@ -29,55 +29,68 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </UserControl.Resources>
-    <TabControl Style="{StaticResource MaterialDesignNavigatilRailTabControl}">
-        <TabControl.ItemContainerStyle>
-            <Style BasedOn="{StaticResource MaterialDesignTabItem}" TargetType="{x:Type TabItem}">
-                <Setter Property="Header" Value="{Binding Name}" />
-            </Style>
-        </TabControl.ItemContainerStyle>
-        <TabControl.Resources>
-            <shView:BindingProxy x:Key="CompositeProxy" Data="{Binding}" />
-            <DataTemplate DataType="{x:Type dt:SquadInfo}">
-                <TextBlock Text="{Binding Name}" />
-            </DataTemplate>
-        </TabControl.Resources>
-        <TabControl.ItemsSource>
-            <CompositeCollection>
-                <TabItem DataContext="{Binding Data, Source={StaticResource CompositeProxy}}" Header="Состав">
-                    <DataGrid IsReadOnly="False" ItemsSource="{Binding Model.Team.Players}">
-                        <DataGrid.Columns>
-                            <md:DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding Name}"
-                                EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="Игрок" />
-                            <md:DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding Number}"
-                                EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="Номер" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </TabItem>
-                <CollectionContainer Collection="{Binding Data.Model.Team.Squads, Source={StaticResource CompositeProxy}}" />
-                <TabItem
-                    Margin="0,0,10,0"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center">
-                    <TabItem.Template>
-                        <ControlTemplate>
-                            <Button
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Command="{Binding DataContext.CreateSquadCommand, ElementName=Root}"
-                                Content="{md:PackIcon Size=20,
-                                                      Kind=Plus}" />
-                        </ControlTemplate>
-                    </TabItem.Template>
-                </TabItem>
-            </CompositeCollection>
-        </TabControl.ItemsSource>
-    </TabControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        <TextBox
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="10"
+            md:HintAssist.Hint="Название команды"
+            FontSize="18"
+            Text="{Binding Model.Team.Name}" />
+        <Button
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="10"
+            BorderThickness="0"
+            Command="{Binding AddPlayerCommand}"
+            Content="{md:PackIcon Kind=PlusBold,
+                                  Size=18}" />
+        <TabControl
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Style="{StaticResource MaterialDesignTabControl}">
+            <TabItem Header="Игроки">
+                <DataGrid IsReadOnly="False" ItemsSource="{Binding Model.Team.Players}">
+                    <DataGrid.Columns>
+                        <md:DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                            ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                            Header="Игрок" />
+                        <md:DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Number}"
+                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                            ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                            Header="Номер" />
+                        <DataGridTemplateColumn Header="Удаление">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="0"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Command="{Binding DataContext.RemovePlayerCommand, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Content="{md:PackIcon Kind=Trash,
+                                                              Size=18}"
+                                        Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </UserControl>

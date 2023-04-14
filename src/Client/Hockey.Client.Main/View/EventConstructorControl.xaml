@@ -80,6 +80,7 @@
         <GroupBox
             Grid.Row="1"
             Padding="10"
+            IsEnabled="{Binding SelectedFactoryCreator, Converter={cv:NullableConverter}, ConverterParameter=reverse}"
             Style="{StaticResource MaterialDesignCardGroupBox}">
             <GroupBox.Header>
                 <UniformGrid Rows=" 1">
@@ -94,9 +95,17 @@
             <StackPanel>
                 <TextBox md:HintAssist.Hint="Наименование" Text="{Binding SelectedFactoryCreator.EventType.Name}" />
                 <TextBox md:HintAssist.Hint="Длительность по умолчанию" Text="{Binding SelectedFactoryCreator.DefaultDuration, StringFormat=\{0:h\\:mm\\:ss\}}" />
+                <ComboBox
+                    md:HintAssist.Hint="Горячая клавиша"
+                    IsEditable="True"
+                    ItemsSource="{Binding BindingKeys}"
+                    SelectedItem="{Binding SelectedFactoryCreator.BindingKey}" />
             </StackPanel>
         </GroupBox>
-        <GroupBox Grid.Row="2" Style="{StaticResource MaterialDesignCardGroupBox}">
+        <GroupBox
+            Grid.Row="2"
+            IsEnabled="{Binding SelectedFactoryCreator, Converter={cv:NullableConverter}, ConverterParameter=reverse}"
+            Style="{StaticResource MaterialDesignCardGroupBox}">
             <GroupBox.Header>
                 <UniformGrid Rows=" 1">
                     <TextBlock
@@ -134,15 +143,15 @@
                                         Grid.Column="0"
                                         Margin="10"
                                         Padding="5"
-                                        md:HintAssist.Hint="Наименование параметра игрока"
-                                        Text="{Binding Name}" />
+                                        md:HintAssist.Hint="Наименование параметра команды"
+                                        Text="{Binding TeamName}" />
                                     <TextBox
                                         Grid.Row="0"
                                         Grid.Column="1"
                                         Margin="10"
                                         Padding="5"
-                                        md:HintAssist.Hint="Наименование параметра команды"
-                                        Text="{Binding TeamName}" />
+                                        md:HintAssist.Hint="Наименование параметра игрока"
+                                        Text="{Binding Name}" />
                                     <ComboBox
                                         Grid.Row="1"
                                         Grid.Column="0"
@@ -221,7 +230,7 @@
                                         Grid.Column="0"
                                         Margin="10"
                                         Padding="5"
-                                        md:HintAssist.Hint="Наименование параметра команды"
+                                        md:HintAssist.Hint="Наименование параметра текста"
                                         Text="{Binding Name}" />
                                     <TextBox
                                         Grid.Column="1"

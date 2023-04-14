@@ -3,6 +3,7 @@ using Hockey.Client.Main.Model.Data.Events;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -13,6 +14,8 @@ internal class EventConstructorViewModel : ReactiveObject
 {
     public IEventConstructorModel Model { get; }
     [Reactive] public EventFactory SelectedFactoryCreator { get; set; }
+
+    public IEnumerable<Key> BindingKeys { get; } = Enum.GetValues<Key>();
 
     public ICommand DeleteEventFactoryCommand { get; }
     public ICommand AddEventFactoryCommand { get; }

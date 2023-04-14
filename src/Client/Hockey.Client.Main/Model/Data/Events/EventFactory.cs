@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 
 namespace Hockey.Client.Main.Model.Data.Events;
 
 internal class EventFactory : ReactiveObject
 {
     [Reactive] public EventType EventType { get; set; }
+    [Reactive] public Key BindingKey { get; set; } = Key.None;
     [Reactive] public TimeSpan DefaultDuration { get; set; }
 
     public ObservableCollection<EventParameterFactory> ParameterFactories { get; }

@@ -7,6 +7,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
 using System.Windows.Input;
+using static Hockey.Client.Shared.Extensions.DialogExtensionsMethods;
 
 namespace Hockey.Client.Main.ViewModel;
 internal class EventsViewModel : ReactiveObject
@@ -17,6 +18,7 @@ internal class EventsViewModel : ReactiveObject
     public ICommand AddEventCommand { get; }
     public ICommand RemoveEventCommand { get; }
     public ICommand PlayEventCommand { get; }
+    public ICommand WriteVideoFromEventsCommand { get; }
 
     [Reactive] public EventInfo SelectedEvent { get; set; }
 
@@ -35,5 +37,17 @@ internal class EventsViewModel : ReactiveObject
                        .Subscribe(x => SelectedEvent = x)
                        .Cache();
 
+
+        WriteVideoFromEventsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            if (!TrySaveFileDialog($"События.MP4",
+                                   "Видео".ConcatExtensions("MP4"),
+                                   out var fileName))
+            {
+                return;
+            }
+
+            await Model.WriteVideoFromEvents(fileName);
+        });
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Hockey.Client.Main.Events;
 using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Shared.Extensions;
-using Microsoft.Win32;
 using OpenCvSharp.WpfExtensions;
 using Prism.Events;
 using ReactiveUI;
@@ -13,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using static Hockey.Client.BusinessLayer.Data.FileExtensions;
+using static Hockey.Client.Shared.Extensions.DialogExtensionsMethods;
 
 namespace Hockey.Client.Main.ViewModel;
 
@@ -169,38 +169,5 @@ internal class MainViewModel : ReactiveObject
 
         ReversePauseCommand = ReactiveCommand.Create(() => Model.IsPaused = !Model.IsPaused);
         UserClickedCommand = ReactiveCommand.Create<bool>(x => Model.IsUserClick = x);
-    }
-
-    private static bool TryOpenFileDialog(string filter, out string fileName)
-    {
-        OpenFileDialog saveFileDialog = new();
-
-        saveFileDialog.Filter = filter;
-
-        if (saveFileDialog.ShowDialog() == false)
-        {
-            fileName = default;
-            return false;
-        }
-
-        fileName = saveFileDialog.FileName;
-        return true;
-    }
-
-    private static bool TrySaveFileDialog(string defaultFileName, string filter, out string fileName)
-    {
-        SaveFileDialog saveFileDialog = new();
-
-        saveFileDialog.Filter = filter;
-        saveFileDialog.FileName = defaultFileName;
-
-        if (saveFileDialog.ShowDialog() == false)
-        {
-            fileName = default;
-            return false;
-        }
-
-        fileName = saveFileDialog.FileName;
-        return true;
     }
 }

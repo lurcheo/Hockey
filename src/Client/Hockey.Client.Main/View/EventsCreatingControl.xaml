@@ -2,10 +2,13 @@
     x:Class="Hockey.Client.Main.View.EventsCreatingControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:Hockey.Client.Main.Behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dd="urn:gong-wpf-dragdrop"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:Hockey.Client.Main.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:vm="clr-namespace:Hockey.Client.Main.ViewModel"
     Name="Root"
     d:DataContext="{d:DesignInstance vm:EventsViewModel}"
@@ -13,6 +16,9 @@
     d:Width="800"
     Style="{StaticResource MaterialDesignUserControl}"
     mc:Ignorable="d">
+    <i:Interaction.Behaviors>
+        <behaviors:EventKeyBindingBehavior EventFactories="{Binding Model.EventFactories}" KeyUpCallback="{Binding AddEventCommand}" />
+    </i:Interaction.Behaviors>
     <ListBox
         dd:DragDrop.IsDragSource="True"
         dd:DragDrop.IsDropTarget="True"
@@ -26,16 +32,22 @@
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
             <DataTemplate>
-                <Button
-                    Width="120"
-                    Height="80"
-                    Margin="8"
-                    Command="{Binding DataContext.AddEventCommand, ElementName=Root}"
-                    CommandParameter="{Binding}"
-                    FontSize="13"
-                    Style="{StaticResource MaterialDesignOutlinedDarkButton}">
-                    <TextBlock Text="{Binding EventType.Name}" TextWrapping="Wrap" />
-                </Button>
+                <md:Badged
+                    Badge="{Binding BindingKey, Converter={local:KeyBadgedConverter}}"
+                    BadgePlacementMode="Top"
+                    CornerRadius="5"
+                    ToolBar.OverflowMode="AsNeeded">
+                    <Button
+                        Width="120"
+                        Height="80"
+                        Margin="8"
+                        Command="{Binding DataContext.AddEventCommand, ElementName=Root}"
+                        CommandParameter="{Binding}"
+                        FontSize="13"
+                        Style="{StaticResource MaterialDesignOutlinedDarkButton}">
+                        <TextBlock Text="{Binding EventType.Name}" TextWrapping="Wrap" />
+                    </Button>
+                </md:Badged>
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>

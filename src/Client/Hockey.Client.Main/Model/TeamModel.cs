@@ -11,10 +11,12 @@ namespace Hockey.Client.Main.Model;
 internal class TeamModel : ReactiveObject, ITeamModel
 {
 	[Reactive] public TeamInfo Team { get; set; }
+	public IGameStore Store { get; }
 
 	public TeamModel(IGameStore store, Expression<Func<IGameStore, TeamInfo>> teamExpresion)
 	{
-		store.WhenAnyValue(teamExpresion)
+		Store = store;
+		Store.WhenAnyValue(teamExpresion)
 			 .Subscribe(x => Team = x)
 			 .Cache();
 	}
