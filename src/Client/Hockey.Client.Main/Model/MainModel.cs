@@ -11,6 +11,7 @@ using Prism.Events;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
@@ -28,10 +29,19 @@ internal class MainModel : ReactiveObject, IMainModel
     public IDtoConverter DtoConverter { get; }
     public IFileService ProjectService { get; }
     [Reactive] public Mat CurrentFrame { get; set; }
+    [Reactive] public PlaybackSpeed SelectedPlaybackSpeed { get; set; }
+    public IReadOnlyList<PlaybackSpeed> PlaybackSpeeds { get; } = new PlaybackSpeed[]
+    {
+        new (0.25, "0.25x"),
+        new (0.5, "0.5x"),
+        new (0.75, "0.75x"),
+        new (1, "Обычная"),
+        new (1.5, "1.5x"),
+        new (2, "2x"),
+    };
 
     [Reactive] public bool IsPaused { get; set; }
     [Reactive] public bool IsUserClick { get; set; }
-    [Reactive] public bool IsPlayEvent { get; set; } = false;
 
     [Reactive] public int MillisecondsPerFrame { get; set; } = 0;
     [Reactive] public long FrameNumber { get; set; } = 0;
@@ -60,6 +70,8 @@ internal class MainModel : ReactiveObject, IMainModel
         DtoConverter = dtoConverter;
         ProjectService = projectService;
 
+        SelectedPlaybackSpeed = PlaybackSpeeds[3];
+
         GameStore.WhenAnyValue(x => x.GuestTeam)
                  .Subscribe(x => GuestTeam = x)
                  .Cache();
@@ -71,6 +83,13 @@ internal class MainModel : ReactiveObject, IMainModel
         this.WhenAnyValue(x => x.FrameNumber)
             .Do(x => CurrentTime = TimeSpan.FromMilliseconds(x * MillisecondsPerFrame))
             .Where(_ => videoReader is not null && IsUserClick)
+            .Do(_ =>
+            {
+                lock (this)
+                {
+                    PlayingState = PlayingState.PlayVideo;
+                }
+            })
             .Throttle(TimeSpan.FromMilliseconds(200))
             .ObserveOnDispatcher()
             .Subscribe(SetPosition)
@@ -86,28 +105,37 @@ internal class MainModel : ReactiveObject, IMainModel
                        .Cache();
     }
 
-    public void SetPosition(long position)
+    public void SetUserPosition(long position)
     {
         lock (this)
         {
+            PlayingState = PlayingState.PlayVideo;
+        }
+
+        SetPosition(position);
+    }
+
+    public void SetPosition(long position)
+    {
+        if (position < 0)
+        {
+            position = 0;
+        }
+
+        if (position > FramesCount - 1)
+        {
+            position = FramesCount - 1;
+        }
+
+        lock (this)
+        {
             videoReader.SetPosition(position);
-
-            FrameInfo info = null;
-            lock (this)
-            {
-                info = videoReader.GetFrame();
-            }
-
+            FrameInfo info = GetFrameSafety(videoReader);
             if (info == default)
             {
                 return;
             }
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                FrameNumber = info.FrameNumber;
-                CurrentFrame = info.Frame;
-            });
+            SetFrameSafety(info.FrameNumber, info.Frame);
         }
     }
 
@@ -135,6 +163,7 @@ internal class MainModel : ReactiveObject, IMainModel
 
                 videoReader = VideoService.ReadVideoFromFile(fileName);
 
+                IsPaused = false;
                 GameStore.VideoPath = fileName;
                 PlayingState = PlayingState.PlayVideo;
                 MillisecondsPerFrame = videoReader.MillisecondsPerFrame;
@@ -151,11 +180,10 @@ internal class MainModel : ReactiveObject, IMainModel
                         {
                             IsPaused = true;
                             PlayingState = PlayingState.PlayVideo;
-                            IsPlayEvent = false;
                         }
                     }
 
-                    while (IsPaused || IsUserClick)
+                    if (IsPaused || IsUserClick)
                     {
                         await Task.Delay(100);
                         continue;
@@ -163,24 +191,16 @@ internal class MainModel : ReactiveObject, IMainModel
 
                     st.Restart();
 
-                    FrameInfo info = null;
-                    lock (this)
-                    {
-                        info = videoReader.GetFrame();
-                    }
+                    FrameInfo info = GetFrameSafety(videoReader);
 
                     if (info == default)
                     {
                         continue;
                     }
 
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        FrameNumber = info.FrameNumber;
-                        CurrentFrame = info.Frame;
-                    });
+                    SetFrameSafety(info.FrameNumber, info.Frame);
 
-                    int delay = (int)(videoReader.MillisecondsPerFrame - st.ElapsedMilliseconds);
+                    int delay = (int)(videoReader.MillisecondsPerFrame / (SelectedPlaybackSpeed?.Multiplier ?? 1) - st.ElapsedMilliseconds);
 
                     if (delay > 0)
                     {
@@ -189,6 +209,27 @@ internal class MainModel : ReactiveObject, IMainModel
                 }
             }
         );
+    }
+
+    private FrameInfo GetFrameSafety(IVideoReader videoReader)
+    {
+        FrameInfo info = null;
+
+        lock (this)
+        {
+            info = videoReader.GetFrame();
+        }
+
+        return info;
+    }
+
+    private void SetFrameSafety(long frameNumber, Mat frame)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            FrameNumber = frameNumber;
+            CurrentFrame = frame;
+        });
     }
 
     public Task SaveProjectToFile(string fileName)
@@ -205,7 +246,6 @@ internal class MainModel : ReactiveObject, IMainModel
             EndEventFrameNumber = (long)(eventInfo.EndEventTime.TotalMilliseconds / MillisecondsPerFrame);
             PlayingState = PlayingState.PlayEvent;
             IsPaused = false;
-            IsPlayEvent = true;
         }
     }
 

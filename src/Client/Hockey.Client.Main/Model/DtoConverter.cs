@@ -3,8 +3,10 @@ using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
 using Hockey.Client.Shared.Dto;
 using Hockey.Client.Shared.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 
 namespace Hockey.Client.Main.Model;
 
@@ -65,6 +67,7 @@ internal class DtoConverter : IDtoConverter
         {
             DefaultDuration = x.DefaultTimeSpan,
             EventType = eventTypeDictionary[x.EventTypeId],
+            BindingKey = Enum.Parse<Key>(x.BindingKey)
         }, out eventFactoryDictionary);
     }
 
@@ -365,6 +368,7 @@ internal class DtoConverter : IDtoConverter
             Id = eventTypesDic[x],
             DefaultTimeSpan = x.DefaultDuration,
             EventTypeId = eventTypesDictionary[x.EventType],
+            BindingKey = x.BindingKey.ToString()
         }).ToArray();
     }
 

@@ -2,10 +2,6 @@
 using Hockey.Client.BusinessLayer.Data;
 using OpenCvSharp;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
 
 namespace Hockey.Client.BusinessLayer.Implementation;
 
@@ -30,7 +26,7 @@ internal class VideoReader : IVideoReader
 
     public void SetPosition(long position)
     {
-        _videoCapture.Set(VideoCaptureProperties.PosFrames, position);
+        _videoCapture.Set(VideoCaptureProperties.PosFrames, position - 1);
     }
 
     public FrameInfo GetFrame()

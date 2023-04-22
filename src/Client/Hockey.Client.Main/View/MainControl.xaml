@@ -112,6 +112,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -119,6 +120,8 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <ToggleButton
+                        Grid.Row="0"
+                        Grid.Column="0"
                         Margin="15"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
@@ -127,7 +130,7 @@
                         Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
                     <ToggleButton
                         Grid.Row="0"
-                        Grid.Column="2"
+                        Grid.Column="3"
                         Margin="15"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
@@ -142,25 +145,35 @@
                     <Image
                         Grid.Row="0"
                         Grid.Column="0"
-                        Grid.ColumnSpan="3"
+                        Grid.ColumnSpan="4"
                         Margin="65,0,65,0"
                         VerticalAlignment="Bottom"
                         Source="{Binding Frame}" />
-                    <TextBlock
+                    <ComboBox
                         Grid.Row="1"
                         Grid.Column="1"
+                        Width="100"
+                        Margin="13,0"
                         VerticalAlignment="Center"
-                        DataContext="{Binding Model}">
-                        <Run Text="{Binding CurrentTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
-                        <Run Text="/" />
-                        <Run Text="{Binding EndTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
-                    </TextBlock>
+                        md:HintAssist.Hint="Скорость"
+                        DisplayMemberPath="DisplayName"
+                        FontSize="15"
+                        ItemsSource="{Binding Model.PlaybackSpeeds}"
+                        SelectedItem="{Binding Model.SelectedPlaybackSpeed}"
+                        Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
                     <UniformGrid
                         Grid.Row="1"
                         Grid.Column="0"
                         IsEnabled="{Binding Model.IsPlayEvent, Converter={cv:ReverseBoolConverter}}"
                         Rows="1">
-                        <Button Content="{md:PackIcon Kind=ArrowLeftBoldCircleOutline}" Style="{StaticResource IconButton}" />
+                        <Button
+                            Command="{Binding ShowPrevious10SecondsCommand}"
+                            Content="{md:PackIcon Kind=ArrowLeftBoldBoxOutline}"
+                            Style="{StaticResource IconButton}" />
+                        <Button
+                            Command="{Binding ShowPreviousFrameCommand}"
+                            Content="{md:PackIcon Kind=ArrowLeftBoldCircleOutline}"
+                            Style="{StaticResource IconButton}" />
                         <Button Command="{Binding ReversePauseCommand}">
                             <Button.Style>
                                 <Style BasedOn="{StaticResource IconButton}" TargetType="{x:Type Button}">
@@ -175,15 +188,32 @@
                                 </Style>
                             </Button.Style>
                         </Button>
-                        <Button
+                        <!--<Button
                             Command="{Binding StopVideoCommand}"
                             Content="{md:PackIcon Kind=StopCircleOutline}"
+                            Style="{StaticResource IconButton}" />-->
+                        <Button
+                            Command="{Binding ShowNextFrameCommand}"
+                            Content="{md:PackIcon Kind=ArrowRightBoldCircleOutline}"
                             Style="{StaticResource IconButton}" />
-                        <Button Content="{md:PackIcon Kind=ArrowRightBoldCircleOutline}" Style="{StaticResource IconButton}" />
+                        <Button
+                            Command="{Binding ShowNext10SecondsCommand}"
+                            Content="{md:PackIcon Kind=ArrowRightBoldBoxOutline}"
+                            Style="{StaticResource IconButton}" />
                     </UniformGrid>
-                    <Slider
+                    <TextBlock
                         Grid.Row="1"
                         Grid.Column="2"
+                        VerticalAlignment="Center"
+                        DataContext="{Binding Model}"
+                        FontSize="17">
+                        <Run Text="{Binding CurrentTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
+                        <Run Text="/" />
+                        <Run Text="{Binding EndTime, StringFormat=\{0:h\\:mm\\:ss\}}" />
+                    </TextBlock>
+                    <Slider
+                        Grid.Row="1"
+                        Grid.Column="3"
                         Margin="10,20,10,20"
                         IsEnabled="{Binding Model.IsPlayEvent, Converter={cv:ReverseBoolConverter}}"
                         Maximum="{Binding Model.FramesCount}"

@@ -8,6 +8,7 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -23,6 +24,7 @@ internal class MainViewModel : ReactiveObject
 
     [Reactive] public ImageSource Frame { get; set; }
     [Reactive] public CancellationTokenSource LastTokenSource { get; set; }
+    private Task lastReadingTask;
 
     [Reactive] public bool IsLeftMenuOpen { get; set; }
     [Reactive] public bool IsRightMenuOpen { get; set; }
@@ -38,6 +40,12 @@ internal class MainViewModel : ReactiveObject
     public ICommand SaveProjectToFileCommand { get; }
 
     public ICommand ReversePauseCommand { get; }
+
+    public ICommand ShowNextFrameCommand { get; }
+    public ICommand ShowPreviousFrameCommand { get; }
+
+    public ICommand ShowNext10SecondsCommand { get; }
+    public ICommand ShowPrevious10SecondsCommand { get; }
 
     public ICommand UserClickedCommand { get; }
     public ICommand StopVideoCommand { get; }
@@ -56,6 +64,15 @@ internal class MainViewModel : ReactiveObject
                        .ToObservable()
                        .Subscribe(_ => IsRightMenuOpen = true)
                        .Cache();
+
+        ShowNextFrameCommand = ReactiveCommand.Create(() => SetNextFramePosition(1));
+        ShowPreviousFrameCommand = ReactiveCommand.Create(() => SetNextFramePosition(-1));
+
+        ShowNext10SecondsCommand = ReactiveCommand.Create(() =>
+                SetNextFramePosition(TimeSpan.FromSeconds(10)));
+
+        ShowPrevious10SecondsCommand = ReactiveCommand.Create(() =>
+                SetNextFramePosition(-TimeSpan.FromSeconds(10)));
 
         SaveHomeTeamToFileCommand = ReactiveCommand.CreateFromTask
         (
@@ -126,7 +143,14 @@ internal class MainViewModel : ReactiveObject
 
                 LastTokenSource?.Cancel();
                 LastTokenSource = new();
-                await Model.ReadProjectFromFile(fileName, LastTokenSource.Token);
+
+                if (lastReadingTask is not null)
+                {
+                    await lastReadingTask;
+                }
+
+                lastReadingTask = Model.ReadProjectFromFile(fileName, LastTokenSource.Token);
+                await lastReadingTask;
             }
         );
 
@@ -161,7 +185,14 @@ internal class MainViewModel : ReactiveObject
 
                 LastTokenSource?.Cancel();
                 LastTokenSource = new();
-                await Model.ReadVideoFromFile(fileName, LastTokenSource.Token);
+
+                if (lastReadingTask is not null)
+                {
+                    await lastReadingTask;
+                }
+
+                lastReadingTask = Model.ReadVideoFromFile(fileName, LastTokenSource.Token);
+                await lastReadingTask;
             }
         );
 
@@ -169,5 +200,15 @@ internal class MainViewModel : ReactiveObject
 
         ReversePauseCommand = ReactiveCommand.Create(() => Model.IsPaused = !Model.IsPaused);
         UserClickedCommand = ReactiveCommand.Create<bool>(x => Model.IsUserClick = x);
+    }
+
+    private void SetNextFramePosition(long deltaFrameNumber)
+    {
+        Model.SetUserPosition(Model.FrameNumber + deltaFrameNumber);
+    }
+
+    private void SetNextFramePosition(TimeSpan deltaFrame)
+    {
+        SetNextFramePosition((long)(deltaFrame.TotalMilliseconds / Model.MillisecondsPerFrame));
     }
 }

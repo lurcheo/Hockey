@@ -3,6 +3,7 @@ using Hockey.Client.Main.Model.Data.Events;
 using OpenCvSharp;
 using ReactiveUI;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,7 +15,6 @@ internal interface IMainModel : IReactiveObject
 
     bool IsPaused { get; set; }
     bool IsUserClick { get; set; }
-    bool IsPlayEvent { get; set; }
     int MillisecondsPerFrame { get; set; }
     long FrameNumber { get; set; }
     long EndEventFrameNumber { get; set; }
@@ -24,6 +24,8 @@ internal interface IMainModel : IReactiveObject
 
     PlayingState PlayingState { get; set; }
     long FramesCount { get; set; }
+    IReadOnlyList<PlaybackSpeed> PlaybackSpeeds { get; }
+    PlaybackSpeed SelectedPlaybackSpeed { get; set; }
 
     Task ReadVideoFromFile(string fileName, CancellationToken cancellationToken);
     void SetPosition(long position);
@@ -34,4 +36,5 @@ internal interface IMainModel : IReactiveObject
     Task SaveGuestTeamToFile(string fileName);
     Task ReadGuestTeamToFile(string fileName);
     Task ReadProjectFromFile(string fileName, CancellationToken cancellationToken);
+    void SetUserPosition(long position);
 }
