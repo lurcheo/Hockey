@@ -13,6 +13,8 @@ internal interface IEventModel : IReactiveObject
     ObservableCollection<EventFactory> EventFactories { get; set; }
     IEnumerable<TeamInfo> Teams { get; set; }
     int VideoSavingProgress { get; set; }
+    IEnumerable<EventInfo> FiltredEvents { get; set; }
+    EventFactory FiltredEventFactory { get; set; }
 
     EventInfo CreateEvent(EventFactory factory);
     Task WriteVideoFromEvents(string filePath);

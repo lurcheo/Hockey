@@ -20,6 +20,9 @@ namespace Hockey.Client.Main.Model;
 internal class EventModel : ReactiveObject, IEventModel
 {
     [Reactive] public ObservableCollection<EventInfo> Events { get; set; }
+    [Reactive] public IEnumerable<EventInfo> FiltredEvents { get; set; }
+
+    [Reactive] public EventFactory FiltredEventFactory { get; set; }
     [Reactive] public ObservableCollection<EventFactory> EventFactories { get; set; }
     [Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
 
@@ -30,6 +33,7 @@ internal class EventModel : ReactiveObject, IEventModel
     public IEventAggregator EventAggregator { get; }
 
     private IDisposable eventAddedDisposable;
+    private IDisposable filterDisposable;
 
     public EventModel(IGameStore store, IVideoService videoService, IEventAggregator eventAggregator)
     {
@@ -40,6 +44,22 @@ internal class EventModel : ReactiveObject, IEventModel
         Store.WhenAnyValue(x => x.Events)
              .Subscribe(x => Events = x)
              .Cache();
+
+        this.WhenAnyValue(x => x.Events)
+            .Subscribe(events =>
+            {
+                filterDisposable?.Dispose();
+
+                filterDisposable = events.ToObservable()
+                                         .Select(_ => events)
+                                         .Merge(this.WhenAnyValue(x => x.FiltredEventFactory)
+                                                    .Select(_ => events))
+                                         .Select(Filter)
+                                         .Subscribe(filtred => FiltredEvents = filtred);
+
+                FiltredEvents = Filter(events);
+            })
+            .Cache();
 
         this.WhenAnyValue(x => x.Events)
             .Do(_ => eventAddedDisposable?.Dispose())
@@ -58,6 +78,18 @@ internal class EventModel : ReactiveObject, IEventModel
                            (home, guest) => new[] { home, guest })
             .Subscribe(x => Teams = x)
             .Cache();
+    }
+
+    private IReadOnlyList<EventInfo> Filter(IEnumerable<EventInfo> eventInfos)
+    {
+        var result = eventInfos;
+
+        if (FiltredEventFactory is not null)
+        {
+            result = result.Where(x => x.EventType == FiltredEventFactory.EventType);
+        }
+
+        return result.ToList();
     }
 
     public EventInfo CreateEvent(EventFactory factory)
@@ -80,9 +112,9 @@ internal class EventModel : ReactiveObject, IEventModel
     {
         VideoSavingProgress = 0;
 
-        var moments = Events.Select(x => new GameMoment(x.StartEventTime,
+        var moments = FiltredEvents.Select(x => new GameMoment(x.StartEventTime,
                                                         x.EndEventTime))
-                            .ToList();
+                                   .ToList();
 
         await VideoService.WriteMomentToVideoFile(Store.VideoPath, filePath, moments, x => VideoSavingProgress = (int)(x * 100));
 

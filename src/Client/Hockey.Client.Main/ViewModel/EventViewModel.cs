@@ -20,12 +20,16 @@ internal class EventsViewModel : ReactiveObject
     public ICommand PlayEventCommand { get; }
     public ICommand WriteVideoFromEventsCommand { get; }
 
+    public ICommand ResetFilter { get; }
+
     [Reactive] public EventInfo SelectedEvent { get; set; }
 
     public EventsViewModel(IEventModel model, IEventAggregator eventAggregator)
     {
         Model = model;
         EventAggregator = eventAggregator;
+
+        ResetFilter = ReactiveCommand.Create(() => Model.FiltredEventFactory = null);
 
         AddEventCommand = ReactiveCommand.Create<EventFactory>(x => Model.Events.Add(Model.CreateEvent(x)));
         RemoveEventCommand = ReactiveCommand.Create<EventInfo>(x => Model.Events.Remove(x));
