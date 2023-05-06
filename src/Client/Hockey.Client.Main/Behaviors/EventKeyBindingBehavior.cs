@@ -29,14 +29,16 @@ internal class EventKeyBindingBehavior : Behavior<UIElement>
     protected override void OnAttached()
     {
         base.OnAttached();
-        AssociatedObject.KeyUp += AssociatedObjectKeyUp;
+        AssociatedObject.KeyDown += AssociatedObjectKeyDown;
     }
 
-    private void AssociatedObjectKeyUp(object sender, KeyEventArgs e)
+
+    private void AssociatedObjectKeyDown(object sender, KeyEventArgs e)
     {
         foreach (var eventFactory in EventFactories)
         {
-            if (eventFactory.BindingKey == e.Key)
+            if (Keyboard.Modifiers == eventFactory.AdditionalBindingKey
+                && eventFactory.BindingKey == e.Key)
             {
                 KeyUpCallback.Execute(eventFactory);
             }
@@ -46,6 +48,6 @@ internal class EventKeyBindingBehavior : Behavior<UIElement>
     protected override void OnDetaching()
     {
         base.OnDetaching();
-        AssociatedObject.KeyUp -= AssociatedObjectKeyUp;
+        AssociatedObject.KeyDown -= AssociatedObjectKeyDown;
     }
 }

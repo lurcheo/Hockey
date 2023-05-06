@@ -16,6 +16,12 @@ internal class EventConstructorViewModel : ReactiveObject
     [Reactive] public EventFactory SelectedFactoryCreator { get; set; }
 
     public IEnumerable<Key> BindingKeys { get; } = Enum.GetValues<Key>();
+    public IEnumerable<ModifierKeys> BindingModifierKeys { get; } = new[]
+    {
+        ModifierKeys.None,
+        ModifierKeys.Control,
+        ModifierKeys.Shift
+    };
 
     public ICommand DeleteEventFactoryCommand { get; }
     public ICommand AddEventFactoryCommand { get; }

@@ -5,16 +5,17 @@ using System.Windows.Input;
 
 namespace Hockey.Client.Main.View;
 
-internal class KeyBadgedConverter : ConverterBase<KeyBadgedConverter>
+internal class KeyBadgedConverter : TwoValuesConverterBase<KeyBadgedConverter, ModifierKeys, Key>
 {
-    public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        var key = (Key)value;
+    private KeyConverter keyConverter = new();
 
-        return value switch
+    public override object Convert(ModifierKeys first, Key second, Type targetType, object parameter, CultureInfo culture)
+    {
+        return (first, second) switch
         {
-            Key.None => null,
-            _ => key
+            (_, Key.None) => null,
+            (ModifierKeys.None, _) => second.ToString(),
+            (_, _) => $"{first} + {second}"
         };
     }
 }

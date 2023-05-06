@@ -17,6 +17,19 @@
     Style="{StaticResource MaterialDesignUserControl}"
     mc:Ignorable="d">
     <Grid>
+        <Grid.InputBindings>
+            <KeyBinding Key="Left" Command="{Binding ShowPreviousFrameCommand}" />
+            <KeyBinding
+                Key="Left"
+                Command="{Binding ShowPrevious10SecondsCommand}"
+                Modifiers="Ctrl" />
+            <KeyBinding Key="Right" Command="{Binding ShowNextFrameCommand}" />
+            <KeyBinding
+                Key="Right"
+                Command="{Binding ShowNext10SecondsCommand}"
+                Modifiers="Ctrl" />
+            <KeyBinding Key="Space" Command="{Binding ReversePauseCommand}" />
+        </Grid.InputBindings>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition />

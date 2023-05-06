@@ -26,6 +26,7 @@ internal interface IMainModel : IReactiveObject
     long FramesCount { get; set; }
     IReadOnlyList<PlaybackSpeed> PlaybackSpeeds { get; }
     PlaybackSpeed SelectedPlaybackSpeed { get; set; }
+    bool IsVideoOpen { get; set; }
 
     Task ReadVideoFromFile(string fileName, CancellationToken cancellationToken);
     void SetPosition(long position);

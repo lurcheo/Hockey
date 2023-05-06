@@ -11,7 +11,10 @@ namespace Hockey.Client.Main.Model.Data.Events;
 internal class EventFactory : ReactiveObject
 {
     [Reactive] public EventType EventType { get; set; }
+
+    [Reactive] public ModifierKeys AdditionalBindingKey { get; set; } = ModifierKeys.None;
     [Reactive] public Key BindingKey { get; set; } = Key.None;
+
     [Reactive] public TimeSpan DefaultDuration { get; set; }
 
     public ObservableCollection<EventParameterFactory> ParameterFactories { get; }

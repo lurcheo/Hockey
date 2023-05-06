@@ -49,11 +49,11 @@ internal class DtoConverter : IDtoConverter
 
     {
         store.Players.GetIdDictionaryFromDto(x =>
-         {
-             PlayerInfo player = new(x.Name, x.Number);
-             teamDictionary[x.TeamId].Players.Add(player);
-             return player;
-         }, out playerDictionary);
+        {
+            PlayerInfo player = new(x.Name, x.Number);
+            teamDictionary[x.TeamId].Players.Add(player);
+            return player;
+        }, out playerDictionary);
     }
 
     private static void ReadTypes(GameProjectDto store, out IReadOnlyDictionary<int, EventType> eventTypeDictionary)
@@ -67,7 +67,8 @@ internal class DtoConverter : IDtoConverter
         {
             DefaultDuration = x.DefaultTimeSpan,
             EventType = eventTypeDictionary[x.EventTypeId],
-            BindingKey = Enum.Parse<Key>(x.BindingKey)
+            BindingKey = Enum.Parse<Key>(x.BindingKey),
+            AdditionalBindingKey = Enum.Parse<ModifierKeys>(x.AdditionalBindingKey)
         }, out eventFactoryDictionary);
     }
 
@@ -368,7 +369,8 @@ internal class DtoConverter : IDtoConverter
             Id = eventTypesDic[x],
             DefaultTimeSpan = x.DefaultDuration,
             EventTypeId = eventTypesDictionary[x.EventType],
-            BindingKey = x.BindingKey.ToString()
+            BindingKey = x.BindingKey.ToString(),
+            AdditionalBindingKey = x.AdditionalBindingKey.ToString()
         }).ToArray();
     }
 

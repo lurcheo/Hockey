@@ -33,10 +33,15 @@
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <md:Badged
-                    Badge="{Binding BindingKey, Converter={local:KeyBadgedConverter}}"
                     BadgePlacementMode="Top"
                     CornerRadius="5"
                     ToolBar.OverflowMode="AsNeeded">
+                    <md:Badged.Badge>
+                        <MultiBinding Converter="{local:KeyBadgedConverter}">
+                            <Binding Path="AdditionalBindingKey" />
+                            <Binding Path="BindingKey" />
+                        </MultiBinding>
+                    </md:Badged.Badge>
                     <Button
                         Width="120"
                         Height="80"

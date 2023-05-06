@@ -48,7 +48,6 @@ internal class MainViewModel : ReactiveObject
     public ICommand ShowPrevious10SecondsCommand { get; }
 
     public ICommand UserClickedCommand { get; }
-    public ICommand StopVideoCommand { get; }
 
     public MainViewModel(IMainModel model, IEventAggregator eventAggregator)
     {
@@ -65,14 +64,31 @@ internal class MainViewModel : ReactiveObject
                        .Subscribe(_ => IsRightMenuOpen = true)
                        .Cache();
 
-        ShowNextFrameCommand = ReactiveCommand.Create(() => SetNextFramePosition(1));
-        ShowPreviousFrameCommand = ReactiveCommand.Create(() => SetNextFramePosition(-1));
+        var videoOpenChanged = Model.WhenAnyValue(x => x.IsVideoOpen);
 
-        ShowNext10SecondsCommand = ReactiveCommand.Create(() =>
-                SetNextFramePosition(TimeSpan.FromSeconds(10)));
+        ShowNextFrameCommand = ReactiveCommand.Create
+        (
+            () => SetNextFramePosition(1),
+            videoOpenChanged
+        );
 
-        ShowPrevious10SecondsCommand = ReactiveCommand.Create(() =>
-                SetNextFramePosition(-TimeSpan.FromSeconds(10)));
+        ShowPreviousFrameCommand = ReactiveCommand.Create
+        (
+            () => SetNextFramePosition(-1),
+            videoOpenChanged
+        );
+
+        ShowNext10SecondsCommand = ReactiveCommand.Create
+        (
+            () => SetNextFramePosition(TimeSpan.FromSeconds(10)),
+            videoOpenChanged
+        );
+
+        ShowPrevious10SecondsCommand = ReactiveCommand.Create
+        (
+            () => SetNextFramePosition(-TimeSpan.FromSeconds(10)),
+            videoOpenChanged
+        );
 
         SaveHomeTeamToFileCommand = ReactiveCommand.CreateFromTask
         (
@@ -196,10 +212,17 @@ internal class MainViewModel : ReactiveObject
             }
         );
 
-        StopVideoCommand = ReactiveCommand.Create(() => LastTokenSource.Cancel());
+        ReversePauseCommand = ReactiveCommand.Create
+        (
+            () => Model.IsPaused = !Model.IsPaused,
+            videoOpenChanged
+        );
 
-        ReversePauseCommand = ReactiveCommand.Create(() => Model.IsPaused = !Model.IsPaused);
-        UserClickedCommand = ReactiveCommand.Create<bool>(x => Model.IsUserClick = x);
+        UserClickedCommand = ReactiveCommand.Create<bool>
+        (
+            x => Model.IsUserClick = x,
+            videoOpenChanged
+        );
     }
 
     private void SetNextFramePosition(long deltaFrameNumber)

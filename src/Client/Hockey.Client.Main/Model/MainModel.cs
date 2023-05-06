@@ -42,6 +42,7 @@ internal class MainModel : ReactiveObject, IMainModel
 
     [Reactive] public bool IsPaused { get; set; }
     [Reactive] public bool IsUserClick { get; set; }
+    [Reactive] public bool IsVideoOpen { get; set; } = false;
 
     [Reactive] public int MillisecondsPerFrame { get; set; } = 0;
     [Reactive] public long FrameNumber { get; set; } = 0;
@@ -82,7 +83,7 @@ internal class MainModel : ReactiveObject, IMainModel
 
         this.WhenAnyValue(x => x.FrameNumber)
             .Do(x => CurrentTime = TimeSpan.FromMilliseconds(x * MillisecondsPerFrame))
-            .Where(_ => videoReader is not null && IsUserClick)
+            .Where(_ => IsVideoOpen && IsUserClick)
             .Do(_ =>
             {
                 lock (this)
@@ -107,6 +108,11 @@ internal class MainModel : ReactiveObject, IMainModel
 
     public void SetUserPosition(long position)
     {
+        if (!IsVideoOpen)
+        {
+            return;
+        }
+
         lock (this)
         {
             PlayingState = PlayingState.PlayVideo;
@@ -117,6 +123,11 @@ internal class MainModel : ReactiveObject, IMainModel
 
     public void SetPosition(long position)
     {
+        if (!IsVideoOpen)
+        {
+            return;
+        }
+
         if (position < 0)
         {
             position = 0;
@@ -169,6 +180,11 @@ internal class MainModel : ReactiveObject, IMainModel
                 MillisecondsPerFrame = videoReader.MillisecondsPerFrame;
                 FramesCount = videoReader.FramesCount;
                 EndTime = TimeSpan.FromMilliseconds(FramesCount * MillisecondsPerFrame);
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    IsVideoOpen = true;
+                });
 
                 var st = Stopwatch.StartNew();
 
@@ -239,6 +255,11 @@ internal class MainModel : ReactiveObject, IMainModel
 
     public void PlayEvent(EventInfo eventInfo)
     {
+        if (!IsVideoOpen)
+        {
+            return;
+        }
+
         SetPosition((long)(eventInfo.StartEventTime.TotalMilliseconds / MillisecondsPerFrame));
 
         lock (this)
