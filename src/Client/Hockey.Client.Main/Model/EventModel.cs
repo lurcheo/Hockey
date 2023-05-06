@@ -4,6 +4,7 @@ using Hockey.Client.Main.Events;
 using Hockey.Client.Main.Model.Abstraction;
 using Hockey.Client.Main.Model.Data;
 using Hockey.Client.Main.Model.Data.Events;
+using Hockey.Client.Shared;
 using Hockey.Client.Shared.Extensions;
 using Prism.Events;
 using ReactiveUI;
@@ -22,16 +23,18 @@ internal class EventModel : ReactiveObject, IEventModel
     [Reactive] public ObservableCollection<EventInfo> Events { get; set; }
     [Reactive] public IEnumerable<EventInfo> FiltredEvents { get; set; }
 
-    [Reactive] public EventFactory FiltredEventFactory { get; set; }
     [Reactive] public ObservableCollection<EventFactory> EventFactories { get; set; }
-    [Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
 
+    [Reactive] public IEnumerable<Selected<EventType>> SelectedEventTypes { get; set; }
+
+    [Reactive] public IEnumerable<TeamInfo> Teams { get; set; }
     [Reactive] public int VideoSavingProgress { get; set; } = 0;
 
     public IGameStore Store { get; }
     public IVideoService VideoService { get; }
     public IEventAggregator EventAggregator { get; }
 
+    private IDisposable selectedEventTypesDisposable;
     private IDisposable eventAddedDisposable;
     private IDisposable filterDisposable;
 
@@ -48,12 +51,28 @@ internal class EventModel : ReactiveObject, IEventModel
         this.WhenAnyValue(x => x.Events)
             .Subscribe(events =>
             {
+                selectedEventTypesDisposable?.Dispose();
+                selectedEventTypesDisposable = events.ToObservable()
+                                                     .Select(_ => events)
+                                                     .Merge(Observable.Return(events))
+                                                     .Select(x => x.Select(f => f.EventType)
+                                                                   .Distinct()
+                                                                   .Select(f => new Selected<EventType>(f)
+                                                                   {
+                                                                       IsSelected = SelectedEventTypes?.FirstOrDefault(x => x.Item == f)?.IsSelected ?? true
+                                                                   })
+                                                                   .ToArray())
+                                                     .Subscribe(x => SelectedEventTypes = x);
+            })
+            .Cache();
+
+        this.WhenAnyValue(x => x.Events)
+            .Subscribe(events =>
+            {
                 filterDisposable?.Dispose();
 
                 filterDisposable = events.ToObservable()
                                          .Select(_ => events)
-                                         .Merge(this.WhenAnyValue(x => x.FiltredEventFactory)
-                                                    .Select(_ => events))
                                          .Select(Filter)
                                          .Subscribe(filtred => FiltredEvents = filtred);
 
@@ -80,16 +99,14 @@ internal class EventModel : ReactiveObject, IEventModel
             .Cache();
     }
 
-    private IReadOnlyList<EventInfo> Filter(IEnumerable<EventInfo> eventInfos)
+    public IReadOnlyList<EventInfo> Filter(IEnumerable<EventInfo> eventInfos)
     {
-        var result = eventInfos;
+        var selectedEventTypes = SelectedEventTypes.Where(x => x.IsSelected)
+                                                   .Select(x => x.Item)
+                                                   .ToHashSet();
 
-        if (FiltredEventFactory is not null)
-        {
-            result = result.Where(x => x.EventType == FiltredEventFactory.EventType);
-        }
-
-        return result.ToList();
+        return eventInfos.Where(x => selectedEventTypes.Contains(x.EventType))
+                         .ToList();
     }
 
     public EventInfo CreateEvent(EventFactory factory)

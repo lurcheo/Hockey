@@ -6,6 +6,7 @@ using Prism.Events;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using static Hockey.Client.Shared.Extensions.DialogExtensionsMethods;
 
@@ -20,7 +21,8 @@ internal class EventsViewModel : ReactiveObject
     public ICommand PlayEventCommand { get; }
     public ICommand WriteVideoFromEventsCommand { get; }
 
-    public ICommand ResetFilter { get; }
+    public ICommand ResetFilterCommand { get; }
+    public ICommand ApplyFilterCommand { get; }
 
     [Reactive] public EventInfo SelectedEvent { get; set; }
 
@@ -29,7 +31,18 @@ internal class EventsViewModel : ReactiveObject
         Model = model;
         EventAggregator = eventAggregator;
 
-        ResetFilter = ReactiveCommand.Create(() => Model.FiltredEventFactory = null);
+        ResetFilterCommand = ReactiveCommand.Create(() =>
+        {
+            foreach (var selectedEventType in Model.SelectedEventTypes)
+            {
+                selectedEventType.IsSelected = true;
+            }
+        });
+
+        ApplyFilterCommand = ReactiveCommand.Create
+        (
+            () => Model.FiltredEvents = Model.Filter(Model.Events)
+        );
 
         AddEventCommand = ReactiveCommand.Create<EventFactory>(x => Model.Events.Add(Model.CreateEvent(x)));
         RemoveEventCommand = ReactiveCommand.Create<EventInfo>(x => Model.Events.Remove(x));

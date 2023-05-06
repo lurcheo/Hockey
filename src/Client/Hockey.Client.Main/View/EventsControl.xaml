@@ -64,18 +64,43 @@
                     Grid.Row="1"
                     Grid.Column="0"
                     Margin="5"
-                    Command="{Binding ResetFilter}"
+                    Command="{Binding ResetFilterCommand}"
                     Content="{md:PackIcon Kind=FilterOff}"
                     Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
                     Style="{StaticResource IconButton}"
                     ToolTip="Удалить фильтр" />
-                <ComboBox
+                <Menu
+                    Name="FilterRoot"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch">
+                    <MenuItem
+                        Width="{Binding ActualWidth, ElementName=FilterRoot}"
+                        Header="Фильтр по типам"
+                        ItemsSource="{Binding Model.SelectedEventTypes}">
+                        <MenuItem.Resources>
+                            <Style BasedOn="{StaticResource MaterialDesignMenuItem}" TargetType="MenuItem">
+                                <Setter Property="StaysOpenOnClick" Value="True" />
+                            </Style>
+                        </MenuItem.Resources>
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Command="{Binding DataContext.ApplyFilterCommand, ElementName=Root}"
+                                    IsChecked="{Binding IsSelected}">
+                                    <TextBlock Text="{Binding Item.Name}" />
+                                </CheckBox>
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                    </MenuItem>
+                </Menu>
+                <!--<ComboBox
                     Grid.Row="1"
                     Grid.Column="1"
                     DisplayMemberPath="EventType.Name"
                     IsEditable="True"
                     ItemsSource="{Binding Model.EventFactories}"
-                    SelectedItem="{Binding Model.FiltredEventFactory}" />
+                    SelectedItem="{Binding Model.FiltredEventFactory}" />-->
                 <ListView
                     Grid.Row="2"
                     Grid.Column="0"
