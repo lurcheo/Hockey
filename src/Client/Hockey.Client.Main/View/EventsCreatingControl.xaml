@@ -49,7 +49,8 @@
                         Command="{Binding DataContext.AddEventCommand, ElementName=Root}"
                         CommandParameter="{Binding}"
                         FontSize="13"
-                        Style="{StaticResource MaterialDesignOutlinedDarkButton}">
+                        Style="{StaticResource MaterialDesignOutlinedDarkButton}"
+                        ToolTip="Добавить событие">
                         <TextBlock Text="{Binding EventType.Name}" TextWrapping="Wrap" />
                     </Button>
                 </md:Badged>

@@ -48,7 +48,8 @@
                     <Button
                         HorizontalAlignment="Right"
                         Command="{Binding AddEventFactoryCommand}"
-                        Content="{md:PackIcon Kind=PlusBox}" />
+                        Content="{md:PackIcon Kind=PlusBox}"
+                        ToolTip="Добавить новое событие" />
                 </UniformGrid>
             </GroupBox.Header>
             <DataGrid ItemsSource="{Binding Model.Factories}" SelectedItem="{Binding SelectedFactoryCreator}">
@@ -72,7 +73,8 @@
                                     Content="{md:PackIcon Kind=Trash,
                                                           Size=18}"
                                     Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
-                                    Style="{StaticResource IconButton}" />
+                                    Style="{StaticResource IconButton}"
+                                    ToolTip="Удалить событие" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -132,7 +134,7 @@
                         Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
                         Text="Параметры события" />
                     <Menu HorizontalAlignment="Right">
-                        <MenuItem Header="{md:PackIcon Kind=PlusBox}">
+                        <MenuItem Header="{md:PackIcon Kind=PlusBox}" ToolTip="Добавить параметр события">
                             <MenuItem Command="{Binding AddPlayerParameterCommand}" Header="Игрок" />
                             <MenuItem Command="{Binding AddTeamParameterCommand}" Header="Команда" />
                             <MenuItem Command="{Binding AddTextParameterCommand}" Header="Текст" />
@@ -197,7 +199,8 @@
                                         Content="{md:PackIcon Kind=Trash,
                                                               Size=18}"
                                         Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
-                                        Style="{StaticResource IconButton}" />
+                                        Style="{StaticResource IconButton}"
+                                        ToolTip="Удалить параметр события" />
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -231,7 +234,8 @@
                                         Content="{md:PackIcon Kind=Trash,
                                                               Size=18}"
                                         Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
-                                        Style="{StaticResource IconButton}" />
+                                        Style="{StaticResource IconButton}"
+                                        ToolTip="Удалить параметр события" />
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -263,7 +267,8 @@
                                         Content="{md:PackIcon Kind=Trash,
                                                               Size=18}"
                                         Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
-                                        Style="{StaticResource IconButton}" />
+                                        Style="{StaticResource IconButton}"
+                                        ToolTip="Удалить параметр события" />
                                 </Grid>
                             </Border>
                         </DataTemplate>

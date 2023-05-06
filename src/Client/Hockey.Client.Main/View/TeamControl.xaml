@@ -52,7 +52,8 @@
             BorderThickness="0"
             Command="{Binding AddPlayerCommand}"
             Content="{md:PackIcon Kind=PlusBold,
-                                  Size=18}" />
+                                  Size=18}"
+            ToolTip="Добавить игрока" />
         <TabControl
             Grid.Row="1"
             Grid.Column="0"
@@ -84,7 +85,8 @@
                                         CommandParameter="{Binding}"
                                         Content="{md:PackIcon Kind=Trash,
                                                               Size=18}"
-                                        Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" />
+                                        Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                        ToolTip="Удалить игрока" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

@@ -140,7 +140,8 @@
                         VerticalAlignment="Top"
                         AutomationProperties.Name="HamburgerToggleButton"
                         IsChecked="{Binding IsLeftMenuOpen}"
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}"
+                        ToolTip="Открыть панель редактирования событий и команд" />
                     <ToggleButton
                         Grid.Row="0"
                         Grid.Column="3"
@@ -150,7 +151,8 @@
                         AutomationProperties.Name="HamburgerToggleButton"
                         IsChecked="{Binding IsRightMenuOpen}"
                         RenderTransformOrigin="0.5,0.5"
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}">
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}"
+                        ToolTip="Открыть панель управления событиями">
                         <ToggleButton.RenderTransform>
                             <ScaleTransform ScaleX="-1" />
                         </ToggleButton.RenderTransform>
@@ -182,12 +184,14 @@
                         <Button
                             Command="{Binding ShowPrevious10SecondsCommand}"
                             Content="{md:PackIcon Kind=ArrowLeftBoldBoxOutline}"
-                            Style="{StaticResource IconButton}" />
+                            Style="{StaticResource IconButton}"
+                            ToolTip="Перемотать видео на 10 секунд назад" />
                         <Button
                             Command="{Binding ShowPreviousFrameCommand}"
                             Content="{md:PackIcon Kind=ArrowLeftBoldCircleOutline}"
-                            Style="{StaticResource IconButton}" />
-                        <Button Command="{Binding ReversePauseCommand}">
+                            Style="{StaticResource IconButton}"
+                            ToolTip="Показать предыдущий кадр" />
+                        <Button Command="{Binding ReversePauseCommand}" ToolTip="Пауза">
                             <Button.Style>
                                 <Style BasedOn="{StaticResource IconButton}" TargetType="{x:Type Button}">
                                     <Style.Triggers>
@@ -208,11 +212,13 @@
                         <Button
                             Command="{Binding ShowNextFrameCommand}"
                             Content="{md:PackIcon Kind=ArrowRightBoldCircleOutline}"
-                            Style="{StaticResource IconButton}" />
+                            Style="{StaticResource IconButton}"
+                            ToolTip="Показать следующий кадр" />
                         <Button
                             Command="{Binding ShowNext10SecondsCommand}"
                             Content="{md:PackIcon Kind=ArrowRightBoldBoxOutline}"
-                            Style="{StaticResource IconButton}" />
+                            Style="{StaticResource IconButton}"
+                            ToolTip="Перемотать видео на 10 секунд вперед" />
                     </UniformGrid>
                     <TextBlock
                         Grid.Row="1"
