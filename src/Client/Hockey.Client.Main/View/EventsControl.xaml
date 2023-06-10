@@ -59,6 +59,7 @@
                     Margin="10,0,10,0"
                     Maximum="100"
                     Minimum="0"
+                    Style="{StaticResource MaterialDesignLinearProgressBar}"
                     Value="{Binding Model.VideoSavingProgress}" />
                 <Button
                     Grid.Row="1"
@@ -85,9 +86,7 @@
                         </MenuItem.Resources>
                         <MenuItem.ItemTemplate>
                             <DataTemplate>
-                                <CheckBox
-                                    Command="{Binding DataContext.ApplyFilterCommand, ElementName=Root}"
-                                    IsChecked="{Binding IsSelected}">
+                                <CheckBox Command="{Binding DataContext.ApplyFilterCommand, ElementName=Root}" IsChecked="{Binding IsSelected}">
                                     <TextBlock Text="{Binding Item.Name}" />
                                 </CheckBox>
                             </DataTemplate>

@@ -1,6 +1,9 @@
 ﻿using Hockey.Client.BusinessLayer;
 using Hockey.Client.Main;
 using Hockey.Client.Settings;
+using Hockey.Client.Shared.Dialogs;
+using Hockey.Client.Shared.Dialogs.ViewModels;
+using Hockey.Client.Shared.Dialogs.Views;
 using Hockey.Client.Shell.ViewModel;
 using Prism.Ioc;
 using Prism.Modularity;
@@ -21,6 +24,7 @@ public partial class App : PrismApplication
     {
         containerRegistry.AddBusinessLayer();
 
+        containerRegistry.RegisterDialog<ConfirmDialogControl, ConfirmDialogViewModel>(DialogNames.Confirm);
         ViewModelLocationProvider.Register<View.Shell, ShellViewModel>();
     }
 
