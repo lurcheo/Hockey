@@ -11,6 +11,7 @@ using System.Windows.Input;
 using static Hockey.Client.Shared.Extensions.DialogExtensionsMethods;
 
 namespace Hockey.Client.Main.ViewModel;
+
 internal class EventsViewModel : ReactiveObject
 {
     public IEventModel Model { get; }

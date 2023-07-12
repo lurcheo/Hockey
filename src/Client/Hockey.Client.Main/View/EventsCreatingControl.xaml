@@ -16,9 +16,6 @@
     d:Width="800"
     Style="{StaticResource MaterialDesignUserControl}"
     mc:Ignorable="d">
-    <i:Interaction.Behaviors>
-        <behaviors:EventKeyBindingBehavior EventFactories="{Binding Model.EventFactories}" KeyUpCallback="{Binding AddEventCommand}" />
-    </i:Interaction.Behaviors>
     <ListBox
         dd:DragDrop.IsDragSource="True"
         dd:DragDrop.IsDropTarget="True"

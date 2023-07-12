@@ -1,5 +1,6 @@
 ﻿using Hockey.Client.Main.Events;
 using Hockey.Client.Main.Model.Abstraction;
+using Hockey.Client.Main.Model.Data.Events;
 using Hockey.Client.Shared.Extensions;
 using OpenCvSharp.WpfExtensions;
 using Prism.Events;
@@ -29,6 +30,9 @@ internal class MainViewModel : ReactiveObject
     [Reactive] public bool IsLeftMenuOpen { get; set; }
     [Reactive] public bool IsRightMenuOpen { get; set; }
 
+    [Reactive] public int SelectedTabIndex { get; set; } = 0;
+    [Reactive] public bool IsKeyPressingEnable { get; set; } = true;
+
     public ICommand SaveHomeTeamToFileCommand { get; }
     public ICommand ReadHomeTeamToFileCommand { get; }
     public ICommand SaveGuestTeamToFileCommand { get; }
@@ -49,10 +53,18 @@ internal class MainViewModel : ReactiveObject
 
     public ICommand UserClickedCommand { get; }
 
+    public ICommand AddEventCommand { get; }
+
+
     public MainViewModel(IMainModel model, IEventAggregator eventAggregator)
     {
         Model = model;
         EventAggregator = eventAggregator;
+
+        this.WhenAnyValue(x => x.SelectedTabIndex, x => x.IsLeftMenuOpen)
+            .Select(x => x.Item1 is 2 || !x.Item2)
+            .Subscribe(x => IsKeyPressingEnable = x)
+            .Cache();
 
         Model.WhenAnyValue(x => x.CurrentFrame)
              .Select(x => x is null || x.IsDisposed ? default : BitmapSourceConverter.ToBitmapSource(x))
@@ -71,6 +83,8 @@ internal class MainViewModel : ReactiveObject
             () => SetNextFramePosition(1),
             videoOpenChanged
         );
+
+        AddEventCommand = ReactiveCommand.Create<EventFactory>(x => Model.Events.Add(Model.CreateEvent(x)));
 
         ShowPreviousFrameCommand = ReactiveCommand.Create
         (

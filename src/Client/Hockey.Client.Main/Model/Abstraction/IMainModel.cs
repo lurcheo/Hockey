@@ -4,6 +4,7 @@ using OpenCvSharp;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,6 +28,8 @@ internal interface IMainModel : IReactiveObject
     IReadOnlyList<PlaybackSpeed> PlaybackSpeeds { get; }
     PlaybackSpeed SelectedPlaybackSpeed { get; set; }
     bool IsVideoOpen { get; set; }
+    ObservableCollection<EventFactory> EventFactories { get; set; }
+    ObservableCollection<EventInfo> Events { get; set; }
 
     Task ReadVideoFromFile(string fileName, CancellationToken cancellationToken);
     void SetPosition(long position);
@@ -38,4 +41,5 @@ internal interface IMainModel : IReactiveObject
     Task ReadGuestTeamToFile(string fileName);
     Task ReadProjectFromFile(string fileName, CancellationToken cancellationToken);
     void SetUserPosition(long position);
+    EventInfo CreateEvent(EventFactory factory);
 }

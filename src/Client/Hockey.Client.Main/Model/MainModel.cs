@@ -12,6 +12,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
@@ -28,6 +29,10 @@ internal class MainModel : ReactiveObject, IMainModel
     public IEventAggregator EventAggregator { get; }
     public IDtoConverter DtoConverter { get; }
     public IFileService ProjectService { get; }
+
+    [Reactive] public ObservableCollection<EventFactory> EventFactories { get; set; }
+    [Reactive] public ObservableCollection<EventInfo> Events { get; set; }
+
     [Reactive] public Mat CurrentFrame { get; set; }
     [Reactive] public PlaybackSpeed SelectedPlaybackSpeed { get; set; }
     public IReadOnlyList<PlaybackSpeed> PlaybackSpeeds { get; } = new PlaybackSpeed[]
@@ -73,6 +78,14 @@ internal class MainModel : ReactiveObject, IMainModel
 
         SelectedPlaybackSpeed = PlaybackSpeeds[3];
 
+        GameStore.WhenAnyValue(x => x.EventFactories)
+                 .Subscribe(x => EventFactories = x)
+                 .Cache();
+
+        GameStore.WhenAnyValue(x => x.Events)
+                 .Subscribe(x => Events = x)
+                 .Cache();
+
         GameStore.WhenAnyValue(x => x.GuestTeam)
                  .Subscribe(x => GuestTeam = x)
                  .Cache();
@@ -104,6 +117,16 @@ internal class MainModel : ReactiveObject, IMainModel
                        .ToObservable()
                        .Subscribe(PlayEvent)
                        .Cache();
+    }
+
+    public EventInfo CreateEvent(EventFactory factory)
+    {
+        var eventInfo = factory.Create();
+
+        eventInfo.StartEventTime = GameStore.CurrentTime;
+        eventInfo.EndEventTime = eventInfo.StartEventTime + factory.DefaultDuration;
+
+        return eventInfo;
     }
 
     public void SetUserPosition(long position)

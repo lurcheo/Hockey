@@ -26,6 +26,15 @@ internal class EventKeyBindingBehavior : Behavior<UIElement>
     public static readonly DependencyProperty KeyUpCallbackProperty =
         DependencyProperty.Register(nameof(KeyUpCallback), typeof(ICommand), typeof(EventKeyBindingBehavior));
 
+    public bool IsEnabled
+    {
+        get => (bool)GetValue(IsEnabledProperty);
+        set => SetValue(IsEnabledProperty, value);
+    }
+
+    public static readonly DependencyProperty IsEnabledProperty =
+        DependencyProperty.Register(nameof(IsEnabled), typeof(bool), typeof(EventKeyBindingBehavior), new PropertyMetadata(true));
+
     protected override void OnAttached()
     {
         base.OnAttached();
@@ -35,6 +44,11 @@ internal class EventKeyBindingBehavior : Behavior<UIElement>
 
     private void AssociatedObjectKeyDown(object sender, KeyEventArgs e)
     {
+        if (!IsEnabled)
+        {
+            return;
+        }
+
         foreach (var eventFactory in EventFactories)
         {
             if (Keyboard.Modifiers == eventFactory.AdditionalBindingKey
