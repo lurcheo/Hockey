@@ -32,6 +32,70 @@ internal class DtoConverter : IDtoConverter
         store.VideoPath = storeDto.VideoPath;
     }
 
+    public EventsProjectDto ConvertToEventsProject(IGameStore store)
+    {
+        var eventTypesDto = GetTypesDto(store,
+                                        out var eventTypesDictionary);
+
+        var eventFactoriesDto = GetEventFactoriesDto(store,
+                                                     eventTypesDictionary,
+                                                     out var eventFactoriesDictionary);
+
+        var eventParameterFactoriesDto = GetEventParameterFactoriesDto(store,
+                                                                       eventFactoriesDictionary,
+                                                                       out var eventParameterFactoriesDictionary,
+                                                                       out var allEventParameterFactories)
+                                            .Where(x => x.ParameterFactoryType == EventParameterType.Text)
+                                            .ToArray();
+
+        var textEventParameterFactoriesDto = GetTextEventParameterFactoriesDto(allEventParameterFactories,
+                                                                               eventParameterFactoriesDictionary);
+
+        return new EventsProjectDto
+        {
+            EventFactories = eventFactoriesDto,
+            EventParameterFactories = eventParameterFactoriesDto,
+            EventTypes = eventTypesDto,
+            TextEventParameterFactories = textEventParameterFactoriesDto
+        };
+    }
+
+    public List<EventFactory> ConvertFromEventsProject(EventsProjectDto eventsProject)
+    {
+        eventsProject.EventTypes.GetIdDictionaryFromDto(x => new EventType(x.Name), out var eventTypeDictionary);
+
+        var eventFactories = eventsProject.EventFactories.GetIdDictionaryFromDto(x => new EventFactory
+        {
+            DefaultDuration = x.DefaultTimeSpan,
+            EventType = eventTypeDictionary[x.EventTypeId],
+            BindingKey = Enum.Parse<Key>(x.BindingKey),
+            AdditionalBindingKey = Enum.Parse<ModifierKeys>(x.AdditionalBindingKey)
+        }, out var eventFactoryDictionary);
+
+        var textDic = eventsProject.TextEventParameterFactories.ToDictionary(x => x.ParameterId, x => x);
+
+        foreach (var x in eventsProject.EventParameterFactories)
+        {
+            switch (x.ParameterFactoryType)
+            {
+                case EventParameterType.Text:
+                    {
+                        var text = textDic[x.Id];
+                        TextEventParameterFactory parameter = new()
+                        {
+                            DefaultText = text.DefaultText,
+                            Name = x.Name,
+                        };
+
+                        eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
+                        break;
+                    }
+            }
+        }
+
+        return eventFactories.ToList();
+    }
+
     private static void ReadTeams(GameProjectDto store,
                                   out IReadOnlyDictionary<int, TeamInfo> teamDictionary,
                                   out TeamInfo guestTeam,
@@ -87,43 +151,43 @@ internal class DtoConverter : IDtoConverter
             switch (x.ParameterFactoryType)
             {
                 case EventParameterType.Player:
-                {
-                    var player = playerDic[x.Id];
-                    PlayerEventParameterFactory parameter = new()
                     {
-                        DefaultPlayer = player.DefaultPlayerId is null ? null : playersDictionary[player.DefaultPlayerId.Value],
-                        DefaultTeam = player.DefaultTeamId is null ? null : teamsDictionary[player.DefaultTeamId.Value],
-                        TeamName = player.TeamName,
-                        Name = x.Name,
-                    };
+                        var player = playerDic[x.Id];
+                        PlayerEventParameterFactory parameter = new()
+                        {
+                            DefaultPlayer = player.DefaultPlayerId is null ? null : playersDictionary[player.DefaultPlayerId.Value],
+                            DefaultTeam = player.DefaultTeamId is null ? null : teamsDictionary[player.DefaultTeamId.Value],
+                            TeamName = player.TeamName,
+                            Name = x.Name,
+                        };
 
-                    eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
-                    break;
-                }
+                        eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
+                        break;
+                    }
                 case EventParameterType.Team:
-                {
-                    var team = teamDic[x.Id];
-                    TeamEventParameterFactory parameter = new()
                     {
-                        DefaultTeam = team.DefaultTeamId is null ? null : teamsDictionary[team.DefaultTeamId.Value],
-                        Name = x.Name,
-                    };
+                        var team = teamDic[x.Id];
+                        TeamEventParameterFactory parameter = new()
+                        {
+                            DefaultTeam = team.DefaultTeamId is null ? null : teamsDictionary[team.DefaultTeamId.Value],
+                            Name = x.Name,
+                        };
 
-                    eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
-                    break;
-                }
+                        eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
+                        break;
+                    }
                 case EventParameterType.Text:
-                {
-                    var text = textDic[x.Id];
-                    TextEventParameterFactory parameter = new()
                     {
-                        DefaultText = text.DefaultText,
-                        Name = x.Name,
-                    };
+                        var text = textDic[x.Id];
+                        TextEventParameterFactory parameter = new()
+                        {
+                            DefaultText = text.DefaultText,
+                            Name = x.Name,
+                        };
 
-                    eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
-                    break;
-                }
+                        eventFactoryDictionary[x.EventFactoryId].ParameterFactories.Add(parameter);
+                        break;
+                    }
             }
         }
     }
@@ -151,45 +215,45 @@ internal class DtoConverter : IDtoConverter
             switch (x.ParameterType)
             {
                 case EventParameterType.Player:
-                {
-                    var player = playerDic[x.Id];
-                    PlayerEventParameter parameter = new(player.TeamName, x.Name)
                     {
-                        Player = player.PlayerId is null ? null : playersDictionary[player.PlayerId.Value],
-                        Team = player.TeamId is null ? null : teamsDictionary[player.TeamId.Value],
-                    };
+                        var player = playerDic[x.Id];
+                        PlayerEventParameter parameter = new(player.TeamName, x.Name)
+                        {
+                            Player = player.PlayerId is null ? null : playersDictionary[player.PlayerId.Value],
+                            Team = player.TeamId is null ? null : teamsDictionary[player.TeamId.Value],
+                        };
 
-                    eventsDictionary[x.EventId].Parameters.Add(parameter);
-                    break;
-                }
+                        eventsDictionary[x.EventId].Parameters.Add(parameter);
+                        break;
+                    }
                 case EventParameterType.Team:
-                {
-                    var team = teamDic[x.Id];
-                    TeamEventParameter parameter = new(x.Name)
                     {
-                        Team = team.TeamId is null ? null : teamsDictionary[team.TeamId.Value],
-                    };
+                        var team = teamDic[x.Id];
+                        TeamEventParameter parameter = new(x.Name)
+                        {
+                            Team = team.TeamId is null ? null : teamsDictionary[team.TeamId.Value],
+                        };
 
-                    eventsDictionary[x.EventId].Parameters.Add(parameter);
-                    break;
-                }
+                        eventsDictionary[x.EventId].Parameters.Add(parameter);
+                        break;
+                    }
                 case EventParameterType.Text:
-                {
-                    var text = textDic[x.Id];
-                    TextEventParameter parameter = new(x.Name)
                     {
-                        Text = text.Text
-                    };
+                        var text = textDic[x.Id];
+                        TextEventParameter parameter = new(x.Name)
+                        {
+                            Text = text.Text
+                        };
 
-                    eventsDictionary[x.EventId].Parameters.Add(parameter);
-                    break;
-                }
+                        eventsDictionary[x.EventId].Parameters.Add(parameter);
+                        break;
+                    }
             }
 
         }
     }
 
-    public TeamInfo Convert(TeamProjectDto team)
+    public TeamInfo ConvertFromTeamsProject(TeamProjectDto team)
     {
         return new(team.Team.Name,
                    team.Players
@@ -197,7 +261,7 @@ internal class DtoConverter : IDtoConverter
                        .ToArray());
     }
 
-    public TeamProjectDto Convert(TeamInfo teamInfo)
+    public TeamProjectDto ConvertToTeamsProject(TeamInfo teamInfo)
     {
         return new()
         {
@@ -562,5 +626,6 @@ internal class DtoConverter : IDtoConverter
             Text = x.Text
         }).ToArray();
     }
+
     #endregion
 }

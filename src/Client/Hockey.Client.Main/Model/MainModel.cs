@@ -295,21 +295,32 @@ internal class MainModel : ReactiveObject, IMainModel
 
     public Task SaveHomeTeamToFile(string fileName)
     {
-        return ProjectService.SaveToFile(fileName, DtoConverter.Convert(GameStore.HomeTeam));
+        return ProjectService.SaveToFile(fileName, DtoConverter.ConvertToTeamsProject(GameStore.HomeTeam));
     }
 
     public Task SaveGuestTeamToFile(string fileName)
     {
-        return ProjectService.SaveToFile(fileName, DtoConverter.Convert(GameStore.GuestTeam));
+        return ProjectService.SaveToFile(fileName, DtoConverter.ConvertToTeamsProject(GameStore.GuestTeam));
     }
 
     public async Task ReadHomeTeamToFile(string fileName)
     {
-        GameStore.HomeTeam = DtoConverter.Convert(await ProjectService.GetFromFile<TeamProjectDto>(fileName));
+        GameStore.HomeTeam = DtoConverter.ConvertFromTeamsProject(await ProjectService.GetFromFile<TeamProjectDto>(fileName));
     }
 
     public async Task ReadGuestTeamToFile(string fileName)
     {
-        GameStore.GuestTeam = DtoConverter.Convert(await ProjectService.GetFromFile<TeamProjectDto>(fileName));
+        GameStore.GuestTeam = DtoConverter.ConvertFromTeamsProject(await ProjectService.GetFromFile<TeamProjectDto>(fileName));
+    }
+
+    public async Task ReadEventsFromFile(string fileName)
+    {
+        GameStore.EventFactories = new(DtoConverter.ConvertFromEventsProject(await ProjectService.GetFromFile<EventsProjectDto>(fileName)));
+        GameStore.Events = new();
+    }
+
+    public Task SaveEventsToFile(string fileName)
+    {
+        return ProjectService.SaveToFile(fileName, DtoConverter.ConvertToEventsProject(GameStore));
     }
 }

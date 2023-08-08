@@ -55,6 +55,9 @@ internal class MainViewModel : ReactiveObject
 
     public ICommand AddEventCommand { get; }
 
+    public ICommand ReadEventsCommand { get; }
+    public ICommand SaveEventsCommand { get; }
+
 
     public MainViewModel(IMainModel model, IEventAggregator eventAggregator)
     {
@@ -104,55 +107,84 @@ internal class MainViewModel : ReactiveObject
             videoOpenChanged
         );
 
+        SaveEventsCommand = ReactiveCommand.CreateFromTask
+        (
+            (async () =>
+            {
+                if (!TrySaveFileDialog($"События.{EVENTS_FILE_EXTENSION}",
+                                       "Файл событий".ConcatExtensions(EVENTS_FILE_EXTENSION),
+                                       out var fileName))
+                {
+                    return;
+                }
+
+                await Model.SaveEventsToFile(fileName);
+            })
+        );
+
+        ReadEventsCommand = ReactiveCommand.CreateFromTask
+        (
+            (async () =>
+            {
+                if (!TryOpenFileDialog("Файл событий".ConcatExtensions(EVENTS_FILE_EXTENSION),
+                                       out var fileName))
+                {
+                    return;
+                }
+
+                await Model.ReadEventsFromFile(fileName);
+            })
+        );
+
         SaveHomeTeamToFileCommand = ReactiveCommand.CreateFromTask
         (
-            async () =>
+            (async () =>
             {
-                if (!TrySaveFileDialog($"Команда.{TEAM_PROJECT_FILE_EXTENSION}",
-                                       "Файл команды хоккейного матча".ConcatExtensions(TEAM_PROJECT_FILE_EXTENSION),
+                if (!TrySaveFileDialog($"Команда.{TEAM_FILE_EXTENSION}",
+                                       "Файл команды хоккейного матча".ConcatExtensions(TEAM_FILE_EXTENSION),
                                        out var fileName))
                 {
                     return;
                 }
 
                 await Model.SaveHomeTeamToFile(fileName);
-            }
+            })
         );
 
         ReadHomeTeamToFileCommand = ReactiveCommand.CreateFromTask
         (
-            async () =>
+            (async () =>
             {
-                if (!TryOpenFileDialog("Файл команды хоккейного матча".ConcatExtensions(TEAM_PROJECT_FILE_EXTENSION),
+                if (!TryOpenFileDialog("Файл команды хоккейного матча".ConcatExtensions(TEAM_FILE_EXTENSION),
                                        out var fileName))
                 {
                     return;
                 }
 
                 await Model.ReadHomeTeamToFile(fileName);
-            }
+            })
         );
 
         SaveGuestTeamToFileCommand = ReactiveCommand.CreateFromTask
         (
-            async () =>
+            (async () =>
             {
-                if (!TrySaveFileDialog($"Команда.{TEAM_PROJECT_FILE_EXTENSION}",
-                                       "Файл команды хоккейного матча".ConcatExtensions(TEAM_PROJECT_FILE_EXTENSION),
+                if (!TrySaveFileDialog($"Команда.TEAM_FILE_EXTENSION",
+                                       "Файл команды хоккейного матча".ConcatExtensions(TEAM_FILE_EXTENSION),
                                        out var fileName))
                 {
                     return;
                 }
 
                 await Model.SaveGuestTeamToFile(fileName);
-            }
+            })
         );
 
         ReadGuestTeamToFileCommand = ReactiveCommand.CreateFromTask
         (
             async () =>
             {
-                if (!TryOpenFileDialog("Файл команды хоккейного матча".ConcatExtensions(TEAM_PROJECT_FILE_EXTENSION),
+                if (!TryOpenFileDialog("Файл команды хоккейного матча".ConcatExtensions(TEAM_FILE_EXTENSION),
                                        out var fileName))
                 {
                     return;

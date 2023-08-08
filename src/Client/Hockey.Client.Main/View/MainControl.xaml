@@ -42,11 +42,13 @@
                             <MenuItem Command="{Binding ReadProjectFromFileCommand}" Header="Проект" />
                             <MenuItem Command="{Binding ReadHomeTeamToFileCommand}" Header="Домашняя команда" />
                             <MenuItem Command="{Binding ReadGuestTeamToFileCommand}" Header="Гостевая команда" />
+                            <MenuItem Command="{Binding ReadEventsCommand}" Header="События" />
                         </MenuItem>
                         <MenuItem Header="Сохранить">
                             <MenuItem Command="{Binding SaveProjectToFileCommand}" Header="Проект" />
                             <MenuItem Command="{Binding SaveHomeTeamToFileCommand}" Header="Домашняя команда" />
                             <MenuItem Command="{Binding SaveGuestTeamToFileCommand}" Header="Гостевая команда" />
+                            <MenuItem Command="{Binding SaveEventsCommand}" Header="События" />
                         </MenuItem>
                     </MenuItem>
                 </Menu>
@@ -182,16 +184,15 @@
                         VerticalAlignment="Center"
                         md:HintAssist.Hint="Скорость"
                         DisplayMemberPath="DisplayName"
-                        Focusable="False"
                         FontSize="15"
                         ItemsSource="{Binding Model.PlaybackSpeeds}"
                         SelectedItem="{Binding Model.SelectedPlaybackSpeed}"
                         Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
-                    <UniformGrid
+                    <StackPanel
                         Grid.Row="1"
                         Grid.Column="0"
                         IsEnabled="{Binding Model.IsPlayEvent, Converter={cv:ReverseBoolConverter}}"
-                        Rows="1">
+                        Orientation="Horizontal">
                         <Button
                             Command="{Binding ShowPrevious10SecondsCommand}"
                             Content="{md:PackIcon Kind=ArrowLeftBoldBoxOutline}"
@@ -230,7 +231,11 @@
                             Content="{md:PackIcon Kind=ArrowRightBoldBoxOutline}"
                             Style="{StaticResource IconButton}"
                             ToolTip="Перемотать видео на 10 секунд вперед" />
-                    </UniformGrid>
+                        <ToggleButton
+                            Margin="10"
+                            IsChecked="{Binding IsEnabled, ElementName=eventKeysPresser}"
+                            ToolTip="Быстрая разметка" />
+                    </StackPanel>
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="2"

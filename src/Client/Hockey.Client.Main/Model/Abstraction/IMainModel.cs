@@ -40,6 +40,10 @@ internal interface IMainModel : IReactiveObject
     Task SaveGuestTeamToFile(string fileName);
     Task ReadGuestTeamToFile(string fileName);
     Task ReadProjectFromFile(string fileName, CancellationToken cancellationToken);
+
+    Task ReadEventsFromFile(string fileName);
+    Task SaveEventsToFile(string fileName);
+
     void SetUserPosition(long position);
     EventInfo CreateEvent(EventFactory factory);
 }
