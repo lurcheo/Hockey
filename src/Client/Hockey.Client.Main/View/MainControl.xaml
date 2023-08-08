@@ -22,7 +22,6 @@
         <behaviors:EventKeyBindingBehavior
             x:Name="eventKeysPresser"
             EventFactories="{Binding Model.EventFactories}"
-            IsEnabled="{Binding IsKeyPressingEnable}"
             KeyUpCallback="{Binding AddEventCommand}" />
     </i:Interaction.Behaviors>
     <Grid>
@@ -63,7 +62,6 @@
                     <TabControl
                         Width="700"
                         md:NavigationRailAssist.ShowSelectionBackground="True"
-                        SelectedIndex="{Binding SelectedTabIndex, Mode=OneWayToSource}"
                         SnapsToDevicePixels="True"
                         Style="{StaticResource MaterialDesignNavigationRailTabControl}"
                         TabStripPlacement="Left">
